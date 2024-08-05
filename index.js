@@ -1,7 +1,5 @@
 'use strict'
 
-'use strict'
-
 if ("serviceWorker" in navigator)
 {
    try
@@ -50,7 +48,6 @@ const csv = new LocalStorageTable()
    .linkTable(document.getElementById('csv-table'))
    .linkColumnSwitchesContainer(document.getElementById('csv-switches'))
    .linkFilterContainer(document.getElementById('csv-search'))
-
 
 // Event listeners:
 

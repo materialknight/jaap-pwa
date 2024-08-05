@@ -1,3 +1,5 @@
+'use strict'
+
 import { csvParse } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 
 class LocalStorageTable {
