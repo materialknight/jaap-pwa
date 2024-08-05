@@ -14,7 +14,7 @@ addEventListener('install', event => {
             '/',
             '/index.html',
             '/index.js',
-            'manifest.json'
+            '/manifest.json'
          ]))
    )
 })
