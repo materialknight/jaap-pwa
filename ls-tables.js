@@ -284,34 +284,49 @@ class LocalStorageTable {
    }
 }
 
-function getFormData(submitEv, titleCase = false, includeBtns = false) {
+function getFormData(form) {
+   console.log(form)
 
    const formData = {}
 
-   for (const elem of submitEv.target.elements)
+   for (const elem of form.elements)
    {
-      const { type } = elem
+      const { name, id, type, value } = elem
 
-      if (!includeBtns && (type === 'submit' || type === 'button'))
+      switch (type)
       {
-         continue
+         case 'date':
+         case 'datetime-local':
+         case 'month':
+
+            const date = new Date(value)
+
+            // When a date like '2024-08-04' is passed to the Date constructor, the Date constructor assumes it is in UTC at midnight, therefore, if you display the date in your local timezone, you'll see a datetime that is behind (if your local timezone's offset from UTC is negative) or ahead (if your local timezone's offset is positive) the original.
+
+            // For example: I you format new Date('2024-08-04') to the timezone of America/El_Salvador (be it with the Intl object or with date.toLocaleDateString), you'll get 'Sat Aug 03 2024 18:00:00 GMT-0600', which is the day before with a negative offset of 6 hours.
+
+            // The solution is to add the offset before saving the date, like so:
+
+            date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+            formData[name ? name : id] = date.valueOf()
+            break
+
+         case 'number':
+         case 'range':
+
+            formData[name ? name : id] = Number(value)
+            break
+
+         case 'text':
+
+            formData[name ? name : id] = value.trim()
+            break
+
+         default: formData[name ? name : id] = value
       }
-
-      const { name, id, value } = elem
-
-      formData[name ? name : id] = titleCase && type === 'text'
-         ? value
-            .trim()
-            .split(' ')
-            .map(word => word[0].toUpperCase() + word.substring(1).toLowerCase())
-            .join(' ')
-         : value.trim()
    }
 
    return formData
 }
-
-
-
 
 export { LocalStorageTable, getFormData }

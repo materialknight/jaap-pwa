@@ -65,22 +65,24 @@
       <form method='dialog'>
 
          <label for='medidor' class='form-label'>Medidor</label>
-         <input id='medidor' class='form-control' type='number' required placeholder='020318'>
+         <input id='medidor' class='form-control' type='number' required placeholder='020318' name='medidor'>
 
          <label for='zona' class='form-label'>Zona</label>
-         <input id='zona' class='form-control' type='number' required min='1' max='12' placeholder='7'>
+         <input id='zona' class='form-control' type='number' required min='1' max='12' placeholder='7' name='zona'>
 
          <label for='titular' class='form-label'>Titular</label>
-         <input id='titular' class='form-control' type='text' required placeholder='José López' spellcheck='false'>
+         <input id='titular' class='form-control' type='text' required placeholder='José López' spellcheck='false'
+            name='titular'>
 
          <label for='caserío' class='form-label'>Caserío</label>
-         <input id='caserío' class='form-control' type='text' required placeholder='La Profética' spellcheck='false'>
+         <input id='caserío' class='form-control' type='text' required placeholder='La Profética' spellcheck='false'
+            name='caserío'>
 
          <label for='lectura' class='form-label'>Lectura inicial</label>
-         <input id='lectura' class='form-control' type='number' required min='0' value='0'>
+         <input id='lectura' class='form-control' type='number' required min='0' value='0' name='lectura'>
 
          <label for='fecha' class='form-label'>Fecha de lectura inicial</label>
-         <input id='fecha' class='form-control' type='date' required>
+         <input id='fecha' class='form-control' type='date' required name='fecha'>
 
          <!-- <label for='deuda' class='form-label'>Deuda</label>
          <input id='deuda' class='form-control' type='number' required min='0' step='0.01' value='0'> -->

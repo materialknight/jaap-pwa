@@ -1,5 +1,21 @@
 'use strict'
 
+'use strict'
+
+if ("serviceWorker" in navigator)
+{
+   try
+   {
+      navigator.serviceWorker.register('./service-worker.js')
+   } catch (error)
+   {
+      console.error(`Your browser seems to support service workers, but the registration of this app's worker failed with error: ${error}`)
+   }
+} else
+{
+   console.error('Service Workers are not supported by your browser.')
+}
+
 import { csvParse } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 import { LocalStorageTable, getFormData } from './ls-tables.js'
 
@@ -42,6 +58,7 @@ const csv = new LocalStorageTable()
    .linkColumnSwitchesContainer(document.getElementById('csv-switches'))
    .linkFilterContainer(document.getElementById('csv-search'))
 
+
 // Event listeners:
 
 metersBtn.addEventListener(
@@ -70,28 +87,21 @@ meterFilter.addEventListener(
 
 meterDialog.addEventListener('submit', submitEv => {
 
-   const formData = getFormData(submitEv, true)
+   const formData = getFormData(submitEv.target)
 
-   const meter = formData['medidor']
+   // Title case the name of the payer:
 
-   if (meters.data.some(row => meter === row['medidor']))
+   formData['titular'] = formData['titular']
+      .split(' ')
+      .map(word => word[0].toUpperCase() + word.substring(1).toLowerCase())
+      .join(' ')
+
+   if (meters.data.some(row => medidor === row['medidor']))
    {
-      meterRepeated.textContent = meter
+      meterRepeated.textContent = medidor
       meterErrorDialog.showModal()
       return
    }
-
-   // Convert date and number fields to numbers:
-
-   formData['medidor'] = Number(formData['medidor'])
-   formData['zona'] = Number(formData['zona'])
-   formData['lectura'] = Number(formData['lectura'])
-
-   const date = new Date(formData['fecha'])
-
-   date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
-
-   formData['fecha'] = date.valueOf()
 
    meters
       .save(formData)
@@ -121,8 +131,6 @@ csvBtn.addEventListener('change', changeEv => {
          .styleColumnSwitches()
          .formatDates()
          .show()
-
-
    }
 
    reader.readAsText(file)
