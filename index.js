@@ -19,21 +19,15 @@ if ("serviceWorker" in navigator)
 import { LocalStorageTable, getFormData } from './ls-tables.js'
 
 const metersBtn = document.getElementById('meters-btn')
-// const meterSearch = document.getElementById('meter-search')
 const meterAddBtn = document.getElementById('meter-add-btn')
 const meterDialog = document.getElementById('meter-dialog')
 const meterCancelBtn = document.getElementById('meter-cancel-btn')
-// const metersTable = document.getElementById('meters-table')
-// const metersSwitches = document.getElementById('meters-switches')
 const meterErrorDialog = document.getElementById('meter-error-dialog')
 const meterRepeated = document.getElementById('meter-repeated')
 const meterFilter = document.getElementById('meter-filter')
 const meterAddedDialog = document.getElementById('meter-added-dialog')
 
 const csvBtn = document.getElementById('csv-btn')
-// const csvTable = document.getElementById('csv-table')
-// const csvSwitches = document.getElementById('csv-switches')
-// const csvSearch = document.getElementById('csv-search')
 const csvFilter = document.getElementById('csv-filter')
 
 const meters = new LocalStorageTable('meters', [
