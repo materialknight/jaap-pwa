@@ -5,7 +5,7 @@
    "theme_color": "#eeffee",
    "background_color": "#eeffee",
    "display": "standalone",
-   "start_url": "/",
+   "start_url": "/jaap-pwa/",
    "icons": [
       {
          "src": "./favicon.png",

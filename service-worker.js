@@ -11,10 +11,10 @@ addEventListener('install', event => {
       caches
          .open(CURRENT_CACHE)
          .then(cache => cache.addAll([
-            '/',
-            '/index.html',
-            '/index.js',
-            '/manifest.json'
+            './',
+            './index.html',
+            './index.js',
+            './manifest.json'
          ]))
    )
 })

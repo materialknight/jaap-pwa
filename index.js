@@ -16,7 +16,6 @@ if ("serviceWorker" in navigator)
    console.error('Service Workers are not supported by your browser.')
 }
 
-import { csvParse } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 import { LocalStorageTable, getFormData } from './ls-tables.js'
 
 const metersBtn = document.getElementById('meters-btn')
