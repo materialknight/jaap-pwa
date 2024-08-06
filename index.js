@@ -79,16 +79,11 @@ meterDialog.addEventListener('submit', submitEv => {
 
    const formData = getFormData(submitEv.target)
 
-   // Title case the name of the payer:
+   // Feature deleted here: Title case the name of the payer and the name of the caserío.
 
-   formData['titular'] = formData['titular']
-      .split(' ')
-      .map(word => word[0].toUpperCase() + word.substring(1).toLowerCase())
-      .join(' ')
-
-   if (meters.data.some(row => medidor === row['medidor']))
+   if (meters.data.some(row => formData['medidor'] === row['medidor']))
    {
-      meterRepeated.textContent = medidor
+      meterRepeated.textContent = formData['medidor']
       meterErrorDialog.showModal()
       return
    }
@@ -131,3 +126,4 @@ csvFilter.addEventListener(
    inputEv => csv.filter(inputEv),
    { passive: true }
 )
+

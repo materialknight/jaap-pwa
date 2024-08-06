@@ -287,7 +287,6 @@ class LocalStorageTable {
 }
 
 function getFormData(form) {
-   console.log(form)
 
    const formData = {}
 
@@ -303,9 +302,13 @@ function getFormData(form) {
 
             const date = new Date(value)
 
-            // When a date like '2024-08-04' is passed to the Date constructor, the Date constructor assumes it is in UTC at midnight, therefore, if you display the date in your local timezone, you'll see a datetime that is behind (if your local timezone's offset from UTC is negative) or ahead (if your local timezone's offset is positive) the original.
+            // When a date like '2024-08-04' is passed to the Date constructor, the Date constructor assumes it is in UTC at midnight, therefore, if your timezone is not UTC, and you use the Intl object or date.toLocaleDateString to display the date in your timezone, you'll get a datetime that is some hours behind or ahead '04 Aug 2024 00:00:00 GMT' (depending on whether your timezone's offset from UTC is negative or positive).
 
-            // For example: I you format new Date('2024-08-04') to the timezone of America/El_Salvador (be it with the Intl object or with date.toLocaleDateString), you'll get 'Sat Aug 03 2024 18:00:00 GMT-0600', which is the day before with a negative offset of 6 hours.
+            // For example, if your timezone is 'America/El_Salvador' (which is 6 hours behind UTC), and you do:
+
+            // new Date('2024-08-04').toLocaleString()
+
+            // That will return '8/3/2024, 6:00:00 PM', which is 6 hours behind the date given to the Date constructor.
 
             // The solution is to add the offset before saving the date, like so:
 
