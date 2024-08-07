@@ -37,29 +37,32 @@
       <div class='btn-group'>
          <input type='button' id='meters-btn' class='btn btn-success' value='Medidores'>
          <input type='button' class='btn btn-success' id='meter-add-btn' value='+ Medidor'>
+         <input type='button' class='btn btn-warning' id='reading-btn' value='+ Lectura'>
       </div>
 
       <div class='btn-group'>
          <div class='btn btn-primary'>
             <label for='csv-btn'>Abrir CSV</label>
-            <input type='file' id='csv-btn' accept='.csv' class='d-none'>
+            <input type='file' id='csv-btn' accept='.csv' hidden>
          </div>
       </div>
 
-      <search id='meter-search' class='d-none'>
+      <search id='meter-search' hidden>
          <label for='meter-filter'>Filtrar </label>
          <input id='meter-filter' type='search' spellcheck='false'>
       </search>
 
-      <search id='csv-search' class='d-none'>
+      <search id='csv-search' hidden>
          <label for='csv-filter'>Filtrar </label>
          <input id='csv-filter' type='search' spellcheck='false'>
       </search>
 
-      <div class='btn-group d-none' id='meters-switches'></div>
-      <div class='btn-group d-none' id='csv-switches'></div>
+      <div class='btn-group' id='meters-switches' hidden></div>
+      <div class='btn-group' id='csv-switches' hidden></div>
 
    </nav>
+
+   <!-- Meter-registration dialogs: -->
 
    <dialog id='meter-dialog'>
       <form method='dialog'>
@@ -104,10 +107,16 @@
       </form>
    </dialog>
 
+   <!-- Meter-reading dialogs: -->
+
    <dialog id='meter-reading-dialog'>
       <form method='dialog'>
-         <label for='meter-read'>Medidor</label>
-         <input id='meter-read' type='text'>
+         <label for='meter-being-read'>Medidor</label>
+         <input id='meter-being-read' type='number'>
+
+         <label for='meter-being-read'>Medidor</label>
+         <input id='meter-being-read' type='number'>
+
          <input type='submit' value='Ok'>
       </form>
    </dialog>
@@ -120,7 +129,7 @@
       </form>
    </dialog>
 
-   <dialog id='meter-unregistered-dialog'>
+   <dialog id='meter-non-existant-dialog'>
       <form method='dialog'>
          <label for='meter-read'>Medidor</label>
          <input id='meter-read' type='text'>
@@ -137,8 +146,8 @@
    </dialog>
 
    <main>
-      <table id='meters-table' class='table table-striped table-bordered d-none'></table>
-      <table id='csv-table' class='table table-striped table-bordered d-none'></table>
+      <table id='meters-table' class='table table-striped table-bordered' hidden></table>
+      <table id='csv-table' class='table table-striped table-bordered' hidden></table>
    </main>
 </body>
 

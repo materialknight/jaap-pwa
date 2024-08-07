@@ -6,7 +6,7 @@ class LocalStorageTable {
 
    static instances = []
 
-   constructor(storageKey = null, defaultOrder = null, hideClass = 'd-none') {
+   constructor(storageKey = null, defaultOrder = null) {
 
       if (storageKey)
       {
@@ -19,8 +19,6 @@ class LocalStorageTable {
       this.table = null
       this.columnSwitchesContainer = null
       this.filterContainer = null
-
-      this.hideClass = hideClass
 
       this.constructor.instances.push(this)
    }
@@ -124,21 +122,21 @@ class LocalStorageTable {
          // Below, Math.random() is necessary because otherwise, if 2 tables have a column with the same name, their corresponding switches would have the same id, which will cause undefined behavior!
 
          const id = controlledClass.concat(Math.random())
-         const input = document.createElement('input')
+         const checkbox = document.createElement('input')
 
-         input.setAttribute('type', 'checkbox')
-         input.setAttribute('checked', '')
-         input.setAttribute('id', id)
-         input.setAttribute('data-class', controlledClass)
+         checkbox.setAttribute('type', 'checkbox')
+         checkbox.setAttribute('checked', '')
+         checkbox.setAttribute('id', id)
+         checkbox.setAttribute('data-class', controlledClass)
 
-         input.addEventListener('change', changeEv => {
+         checkbox.addEventListener('change', changeEv => {
 
             const controlledClass = changeEv.target.getAttribute('data-class')
             const column = this.table.querySelectorAll('.'.concat(controlledClass))
 
             for (const td of column)
             {
-               td.classList.toggle(this.hideClass)
+               td.hidden = td.hidden ? false : true
             }
          }, { passive: true })
 
@@ -147,7 +145,7 @@ class LocalStorageTable {
          label.setAttribute('for', id)
          label.textContent = col
 
-         this.columnSwitchesContainer.append(input, label)
+         this.columnSwitchesContainer.append(checkbox, label)
       }
 
       return this
@@ -167,11 +165,11 @@ class LocalStorageTable {
 
          if (rowText.includes(soughtVal))
          {
-            row.classList.remove(this.hideClass)
+            row.hidden = false
          }
          else
          {
-            row.classList.add(this.hideClass)
+            row.hidden = true
          }
       }
    }
@@ -185,17 +183,39 @@ class LocalStorageTable {
 
    show() {
 
-      this.table?.classList.remove(this.hideClass)
-      this.columnSwitchesContainer?.classList.remove(this.hideClass)
-      this.filterContainer?.classList.remove(this.hideClass)
+      if (this.table)
+      {
+         this.table.hidden = false
+      }
+
+      if (this.columnSwitchesContainer)
+      {
+         this.columnSwitchesContainer.hidden = false
+      }
+
+      if (this.filterContainer)
+      {
+         this.filterContainer.hidden = false
+      }
 
       for (const instance of this.constructor.instances)
       {
          if (instance !== this)
          {
-            instance.table?.classList.add(this.hideClass)
-            instance.columnSwitchesContainer?.classList.add(this.hideClass)
-            instance.filterContainer?.classList.add(this.hideClass)
+            if (instance.table)
+            {
+               instance.table.hidden = true
+            }
+
+            if (instance.columnSwitchesContainer)
+            {
+               instance.columnSwitchesContainer.hidden = true
+            }
+
+            if (instance.filterContainer)
+            {
+               instance.filterContainer.hidden = true
+            }
          }
       }
    }

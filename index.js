@@ -25,6 +25,9 @@ const meterRepeated = document.getElementById('meter-repeated')
 const meterFilter = document.getElementById('meter-filter')
 const meterAddedDialog = document.getElementById('meter-added-dialog')
 
+const readingBtn = document.getElementById('reading-btn')
+const readingDialog = document.getElementById('meter-reading-dialog')
+
 const csvBtn = document.getElementById('csv-btn')
 const csvFilter = document.getElementById('csv-filter')
 
@@ -94,7 +97,13 @@ meterDialog.addEventListener('submit', submitEv => {
       .formatDates()
 
    meterAddedDialog.showModal()
-})
+}, { passive: true })
+
+readingBtn.addEventListener(
+   'click',
+   () => readingDialog.showModal(),
+   { passive: true }
+)
 
 csvBtn.addEventListener('change', changeEv => {
 
@@ -119,7 +128,7 @@ csvBtn.addEventListener('change', changeEv => {
    }
 
    reader.readAsText(file)
-})
+}, { passive: true })
 
 csvFilter.addEventListener(
    'input',
