@@ -10,7 +10,8 @@
    <link rel="manifest" href="manifest.json" />
    <link rel="icon" href="favicon.png" />
 
-   <script type='module' src='index.js'></script>
+   <!-- <script type='module' src='index.js'></script> -->
+   <script type='module' src='app.js'></script>
 
    <style>
       body {
@@ -64,6 +65,8 @@
 
    <!-- Meter-registration dialogs: -->
 
+   <!-- For registering a new meter: -->
+
    <dialog id='meter-dialog'>
       <form method='dialog'>
 
@@ -93,12 +96,16 @@
       </form>
    </dialog>
 
+   <!-- To confirm the new meter has been successfully added: -->
+
    <dialog id='meter-added-dialog'>
       <form method='dialog'>
          <p>Medidor agregado exitosamente!</p>
          <input type='submit' value='Ok'>
       </form>
    </dialog>
+
+   <!-- Error dialog when the user tries to register a meter already registered: -->
 
    <dialog id='meter-error-dialog'>
       <form method='dialog'>
@@ -109,33 +116,40 @@
 
    <!-- Meter-reading dialogs: -->
 
-   <dialog id='meter-reading-dialog'>
+   <!-- For adding a new meter reading: -->
+
+   <dialog id='reading-dialog'>
       <form method='dialog'>
          <label for='meter-being-read'>Medidor</label>
-         <input id='meter-being-read' type='number'>
+         <input id='meter-being-read' type='number' required name='medidor'>
 
-         <label for='meter-being-read'>Medidor</label>
-         <input id='meter-being-read' type='number'>
+         <label for='meter-reading'>Lectura</label>
+         <input id='meter-reading' type='number' required name='lectura'>
 
+         <input type='submit' value='Ok'>
+         <input type='button' value='Cancelar' id='reading-cancel-btn'>
+      </form>
+   </dialog>
+
+   <!-- To confirm that the meter reading has been successfully registered: -->
+
+   <dialog id='read-confirm-dialog'>
+      <form method='dialog'>
+         <p>Lectura tomada exitosamente!</p>
          <input type='submit' value='Ok'>
       </form>
    </dialog>
 
-   <dialog id='meter-read-confirm-dialog'>
-      <form method='dialog'>
-         <label for='meter-read'>Medidor</label>
-         <input id='meter-read' type='text'>
-         <input type='submit' value='Ok'>
-      </form>
-   </dialog>
+   <!-- Error when the user tries to add a reading for a meter that doesn't exist: -->
 
    <dialog id='meter-non-existant-dialog'>
       <form method='dialog'>
-         <label for='meter-read'>Medidor</label>
-         <input id='meter-read' type='text'>
+         <p>El medidor <span id='non-existant-meter'></span> aún no está registrado!</p>
          <input type='submit' value='Ok'>
       </form>
    </dialog>
+
+   <!-- Error when the meter has been already read: -->
 
    <dialog id='meter-already-read-dialog'>
       <form method='dialog'>
