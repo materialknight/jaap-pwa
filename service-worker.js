@@ -1,7 +1,7 @@
 'use strict'
 
-const CURRENT_CACHE = 'v0.1.5'
-const OLD_CACHE = 'v0.1.4'
+const CURRENT_CACHE = 'v0.1.6'
+const OLD_CACHE = 'v0.1.5'
 
 addEventListener('install', event => {
 
@@ -25,8 +25,9 @@ addEventListener('activate', event => {
 
    event.waitUntil(
       caches
-         .delete(OLD_CACHE)
-         .then(_ => clients.claim())
+         .keys()
+         .then(keys => Promise.all(keys.map(key => key !== CURRENT_CACHE ? caches.delete(key) : null)))
+         .then(() => clients.claim())
    )
 })
 
