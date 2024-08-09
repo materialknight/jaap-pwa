@@ -1,5 +1,18 @@
 'use strict'
 
+// Migration {
+
+let oldData = JSON.parse(localStorage.getItem('meters'));
+
+if (Array.isArray(oldData) && !Array.isArray(oldData[0]))
+{
+   localStorage.clear()
+}
+
+oldData = null
+
+// }
+
 if ("serviceWorker" in navigator)
 {
    try
@@ -75,8 +88,6 @@ let csv = new LocalStorageTable()
 select.addEventListener('change', changeEv => {
 
    const tBodyIndex = meters.table.tBodies.length - Number(changeEv.currentTarget.value)
-
-   console.log(tBodyIndex)
    meters.show(true, tBodyIndex)
 })
 
