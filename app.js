@@ -17,7 +17,8 @@ if ("serviceWorker" in navigator)
 import { LocalStorageTable } from './l-s-tables.js'
 import { getFormData } from './form-data.js'
 
-const metersBtn = document.getElementById('meters-btn')
+const select = document.getElementById('history')
+
 const meterAddBtn = document.getElementById('meter-add-btn')
 const meterDialog = document.getElementById('meter-dialog')
 const meterErrorDialog = document.getElementById('meter-error-dialog')
@@ -43,6 +44,7 @@ const lecturaInput = document.getElementById('meter-reading')
 const csvBtn = document.getElementById('csv-btn')
 const csvFilter = document.getElementById('csv-filter')
 
+
 const meters = new LocalStorageTable(
    'meters',
    [
@@ -66,13 +68,37 @@ let csv = new LocalStorageTable()
    .linkSwitchBox(document.getElementById('csv-switches'))
    .linkFilterBox(document.getElementById('csv-search'))
 
+
+
 // Event listeners:
 
-metersBtn.addEventListener(
-   'click',
-   () => meters.show(),
-   { passive: true }
-)
+select.addEventListener('change', changeEv => {
+
+   const tBodyIndex = meters.table.tBodies.length - Number(changeEv.currentTarget.value)
+
+   console.log(tBodyIndex)
+   meters.show(true, tBodyIndex)
+})
+
+// Add every tBody as an <option> for the <select> element and trigger the above listener {:
+
+for (let i = meters.table.tBodies.length; i > 0; --i)
+{
+   const option = document.createElement('option')
+   option.value = i
+   option.textContent = i
+   select.append(option)
+}
+
+select.dispatchEvent(new Event('change'))
+
+// }
+
+// metersBtn.addEventListener(
+//    'click',
+//    () => meters.show(),
+//    { passive: true }
+// )
 
 meterAddBtn.addEventListener(
    'click',

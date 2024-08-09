@@ -1,7 +1,7 @@
 'use strict'
 
-const CURRENT_CACHE = 'v0.1.4'
-const OLD_CACHE = 'v0.1.3'
+const CURRENT_CACHE = 'v0.1.5'
+const OLD_CACHE = 'v0.1.4'
 
 addEventListener('install', event => {
 
