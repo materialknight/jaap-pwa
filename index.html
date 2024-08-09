@@ -4,28 +4,14 @@
 <head>
    <meta charset='UTF-8'>
    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-   <!-- <script src="https://cdn.jsdelivr.net/npm/d3@7"></script> -->
+
    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
+   <link rel='stylesheet' href='style.css'>
 
    <link rel="manifest" href="manifest.json" />
    <link rel="icon" href="favicon.png" />
 
-   <!-- <script type='module' src='index.js'></script> -->
    <script type='module' src='app.js'></script>
-
-   <style>
-      body {
-         background-color: palegoldenrod;
-      }
-
-      nav {
-         background-color: palegoldenrod;
-      }
-
-      main {
-         background-color: white;
-      }
-   </style>
 
    <title>Registro JAAP</title>
 </head>
@@ -92,7 +78,7 @@
          <input id='deuda' class='form-control' type='number' required min='0' step='0.01' value='0'> -->
 
          <input type='submit' value='Agregar medidor'>
-         <input type='button' value='Cancelar' id='meter-cancel-btn'>
+         <input type='button' value='Cancelar' onclick='this.parentElement.parentElement.close()'>
       </form>
    </dialog>
 
@@ -127,7 +113,7 @@
          <input id='meter-reading' type='number' required name='lectura'>
 
          <input type='submit' value='Ok'>
-         <input type='button' value='Cancelar' id='reading-cancel-btn'>
+         <input type='button' value='Cancelar' onclick='this.parentElement.parentElement.close()'>
       </form>
    </dialog>
 
@@ -149,16 +135,24 @@
       </form>
    </dialog>
 
-   <!-- Error when the meter has been already read: -->
+   <!-- Error when the user attempts to create a new period table by reading a meter that was already read this period, while still having other unread meters this period: -->
 
    <dialog id='meter-already-read-dialog'>
       <form method='dialog'>
-         <label for='meter-read'>Medidor</label>
-         <input id='meter-read' type='text'>
+         <p>No se puede registrar una nueva lectura para el medidor <span class='already-read-meter'></span>, porque eso
+            crearía una nueva tabla para un nuevo periodo, siendo que aún quedan medidores sin leer en este periodo.</p>
+         <p>Para registrar una nueva lectura para el medidor <span class='already-read-meter'></span>, tiene 2 opciones:
+         </p>
+         <p>1- Registrar una lectura para los medidores que faltan (puede poner la misma lectura del periodo anterior).
+         </p>
+         <p>2- Borrar los medidores no leídos de la tabla actual.</p>
+         <p>Si borra los medidores no leídos, estos no aparecerán en la tabla del siguiente periodo, y si necesita
+            leerlos en el futuro, tendrá que volver a registrarlos.</p>
          <input type='submit' value='Ok'>
       </form>
    </dialog>
 
+   <!-- todo: error fecha de toma de medida less than previous one -->
    <main>
       <table id='meters-table' class='table table-striped table-bordered' hidden></table>
       <table id='csv-table' class='table table-striped table-bordered' hidden></table>

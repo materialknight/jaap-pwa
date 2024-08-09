@@ -1,3 +1,5 @@
+'use strict'
+
 export function getFormData(form, leaveUntouched) {
 
    const formData = {}
@@ -5,6 +7,11 @@ export function getFormData(form, leaveUntouched) {
    for (const elem of form.elements)
    {
       const { name, id, type, value } = elem
+
+      if (!name && !id)
+      {
+         continue
+      }
 
       if (leaveUntouched?.includes(name) || leaveUntouched?.includes(id))
       {

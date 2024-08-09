@@ -20,7 +20,6 @@ import { getFormData } from './form-data.js'
 const metersBtn = document.getElementById('meters-btn')
 const meterAddBtn = document.getElementById('meter-add-btn')
 const meterDialog = document.getElementById('meter-dialog')
-const meterCancelBtn = document.getElementById('meter-cancel-btn')
 const meterErrorDialog = document.getElementById('meter-error-dialog')
 const meterRepeated = document.getElementById('meter-repeated')
 const meterFilter = document.getElementById('meter-filter')
@@ -28,10 +27,18 @@ const meterAddedDialog = document.getElementById('meter-added-dialog')
 
 const readingBtn = document.getElementById('reading-btn')
 const readingDialog = document.getElementById('reading-dialog')
-const readingCancelBtn = document.getElementById('reading-cancel-btn')
 const readingConfirmDialog = document.getElementById('read-confirm-dialog')
 const readingErrorDialog = document.getElementById('meter-non-existant-dialog')
 const nonExistantMeter = document.getElementById('non-existant-meter')
+const readAlreadyDialog = document.getElementById('meter-already-read-dialog')
+const alreadyReadMeter = document.querySelectorAll('.already-read-meter')
+
+// To limit the min lectura to the previously-taken lectura {
+
+const medidorBeingRead = document.getElementById('meter-being-read')
+const lecturaInput = document.getElementById('meter-reading')
+
+// }
 
 const csvBtn = document.getElementById('csv-btn')
 const csvFilter = document.getElementById('csv-filter')
@@ -73,12 +80,6 @@ meterAddBtn.addEventListener(
    { passive: true }
 )
 
-meterCancelBtn.addEventListener(
-   'click',
-   () => meterDialog.close(),
-   { passive: true }
-)
-
 meterFilter.addEventListener(
    'input',
    inputEv => meters.filter(inputEv),
@@ -112,15 +113,10 @@ readingBtn.addEventListener(
    { passive: true }
 )
 
-readingCancelBtn.addEventListener(
-   'click',
-   () => readingDialog.close(),
-   { passive: true }
-)
-
 readingDialog.addEventListener('submit', submitEv => {
 
    const { medidor, lectura } = getFormData(submitEv.target, ['medidor'])
+
    let topTBody = meters.history[0]
    const matchingRow = topTBody.find(row => medidor === row['medidor'])
 
@@ -130,8 +126,6 @@ readingDialog.addEventListener('submit', submitEv => {
       readingErrorDialog.showModal()
       return
    }
-
-   //! CAN ONLY BE TESTED ON A NEW TABLE:
 
    if (!matchingRow['fecha'])
    {
@@ -143,8 +137,6 @@ readingDialog.addEventListener('submit', submitEv => {
    }
 
    // When this function didn't return in the previous if-block (because the meter has a corresponding 'fecha'), check if all other rows of the top tbody also have a 'fecha'. If so, create a new tableData array to represent a new tbody (the new 'lectura' and 'fecha' columns will be empty, except for the row whose meter matches the one received from the user; that row will have the 'lectura' received from the form, and today's timestamp as its 'fecha'.
-
-   // The saveNewTable() function will then prepend that data at the beginning of the history array, save the history in localStorage, and insert the new tbody (that corresponds to the newly added tableData) on top of the other tbodies:
 
    if (topTBody.every(row => row['fecha']))
    {
@@ -169,6 +161,15 @@ readingDialog.addEventListener('submit', submitEv => {
       meters.history.unshift(newTableData)
       meters.save()
       readingConfirmDialog.showModal()
+   }
+   else
+   {
+      for (const span of alreadyReadMeter)
+      {
+         span.textContent = medidor
+      }
+
+      readAlreadyDialog.showModal()
    }
 
 })
@@ -203,4 +204,30 @@ csvFilter.addEventListener(
    inputEv => csv.filter(inputEv),
    { passive: true }
 )
+
+// To limit the min lectura to the previously-taken lectura {
+
+medidorBeingRead.addEventListener('change', changeEv => {
+
+   const medidor = changeEv.target.value
+   const topTable = meters.history[0]
+
+   const topTableMatchingRow = topTable.find(row => row['medidor'] === medidor)
+
+   if (typeof topTableMatchingRow?.['lectura'] === 'number')
+   {
+      lecturaInput.min = topTableMatchingRow['lectura']
+      return
+   }
+
+   const prevTable = meters.history[1]
+   const prevTableMatchingRow = prevTable.find(row => row['medidor'] === medidor)
+
+   if (typeof prevTableMatchingRow?.['lectura'] === 'number')
+   {
+      lecturaInput.min = prevTableMatchingRow['lectura']
+   }
+})
+
+// }
 

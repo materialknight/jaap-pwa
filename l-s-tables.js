@@ -161,77 +161,30 @@ class LocalStorageTable {
       localStorage.setItem(this.storageKey, JSON.stringify(this.history))
 
       this.fillTable()
+
+      if (!this.table.hidden)
+      {
+         this.show()
+      }
    }
 
-   saveNewRow(rowData) {
 
-      // TODO: Add feature to save a CSV.
 
-      if (!this.storageKey)
-      {
-         throw "You can't save a table's data if you didn't provide a storage key when you called the LocalStorageTable constructor"
-      }
-
-      this.history[0].push(rowData)
-      localStorage.setItem(this.storageKey, JSON.stringify(this.history))
-
-      const topTBody = this.table.tBodies[0]
-      const newTableRow = this._createBodyTR(topTBody, rowData)
-
-      this._formatTRDates(newTableRow)
-
-      return this
-   }
-
-   saveNewTable(newTableData) {
-
-      if (!this.storageKey)
-      {
-         throw "You can't save a table's data if you didn't provide a storage key when you called the LocalStorageTable constructor"
-      }
-
-      this.history.unshift(newTableData)
-      localStorage.setItem(this.storageKey, JSON.stringify(this.history))
-
-      const newTBody = document.createElement('tbody')
-
-      for (const row of newTableData)
-      {
-         this._formatTRDates(this._createBodyTR(newTBody, row))
-      }
-
-      this.table.insertBefore(newTBody, this.table.tBodies[0])
-
-      return this
-   }
-
-   saveEdit() {
-
-      if (!this.storageKey)
-      {
-         throw "You can't save a table's data if you didn't provide a storage key when you called the LocalStorageTable constructor"
-      }
-
-      localStorage.setItem(this.storageKey, JSON.stringify(this.history))
-
-      const topTBody = this.table.tBodies[0]
-      topTBody.textContent = ''
-
-      for (const rowData of this.history[0])
-      {
-         this._formatTRDates(this._createBodyTR(topTBody, rowData))
-      }
-
-      return this
-   }
-
-   show() {
-
-      // todo: search for the visible body
+   show(onlyOne = true, index = 0) {
 
       if (this.table)
       {
          this.table.hidden = false
+
+         for (const tBody of this.table.tBodies)
+         {
+            tBody.hidden = onlyOne
+         }
+
+         if (onlyOne && this.table.tBodies[index])
+         {
+            this.table.tBodies[index].hidden = false
+         }
       }
 
       if (this.switchBox)
@@ -298,7 +251,7 @@ class LocalStorageTable {
       return this
    }
 
-   _formatTRDates(row) {
+   #_formatTRDates(row) {
 
       // Used by formatDates(), saveNewRow() and a submit listener in index.js.
 
@@ -335,7 +288,7 @@ class LocalStorageTable {
 
          for (const row of tBodyRows)
          {
-            this._formatTRDates(row)
+            this.#_formatTRDates(row)
          }
       }
 
@@ -374,14 +327,14 @@ class LocalStorageTable {
 
          for (const rowData of tableData)
          {
-            this._createBodyTR(tBody, rowData)
+            this.#_createBodyTR(tBody, rowData)
          }
       }
 
       return this
    }
 
-   _createBodyTR(tBody, rowData) {
+   #_createBodyTR(tBody, rowData) {
 
       // Used by #_createTBodies(), saveNewRow() and a submit listener in index.js.
 
