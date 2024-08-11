@@ -5,7 +5,7 @@
    <meta charset='UTF-8'>
    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 
-   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
+   <!-- <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'> -->
    <link rel='stylesheet' href='style.css'>
 
    <link rel="manifest" href="manifest.json" />
@@ -17,39 +17,41 @@
 </head>
 
 <body>
-   <h1 class='h4 text-center'>Registro de la Junta Administradora de Agua Potable</h1>
+   <h1>Registro de la Junta Administradora de Agua Potable</h1>
 
-   <nav class='position-sticky top-0'>
+   <nav>
+      <div class='section-btns'>
 
-      <label for='history'>Tablas</label>
-      <select id='history'></select>
+         <input type='button' value='medidores' id='meters-section'>
 
-      <div class='btn-group'>
-         <!-- <input type='button' id='meters-btn' class='btn btn-success' value='Medidores'> -->
+         <label for='csv-btn'>abrir .csv</label>
+         <input type='file' id='csv-btn' accept='.csv' hidden>
 
-         <input type='button' class='btn btn-success' id='meter-add-btn' value='+ Medidor'>
-         <input type='button' class='btn btn-warning' id='reading-btn' value='+ Lectura'>
-      </div>
-
-      <div class='btn-group'>
-         <div class='btn btn-primary'>
-            <label for='csv-btn'>Abrir CSV</label>
-            <input type='file' id='csv-btn' accept='.csv' hidden>
-         </div>
       </div>
 
       <search id='meter-search' hidden>
-         <label for='meter-filter'>Filtrar </label>
+
+         <label for='history'>Tabla</label>
+         <select id='history'></select>
+
+         <label for='meter-filter'>Filtrar</label>
          <input id='meter-filter' type='search' spellcheck='false'>
+
+         <input type='button' id='meter-add-btn' value='+ medidor'>
+         <input type='button' id='reading-btn' value='+ lectura'>
+
+         <div class='switch-box' id='meters-switches'></div>
+
       </search>
 
       <search id='csv-search' hidden>
+
          <label for='csv-filter'>Filtrar </label>
          <input id='csv-filter' type='search' spellcheck='false'>
-      </search>
 
-      <div class='btn-group' id='meters-switches' hidden></div>
-      <div class='btn-group' id='csv-switches' hidden></div>
+         <div class='switch-box' id='csv-switches'></div>
+
+      </search>
 
    </nav>
 
@@ -59,7 +61,6 @@
 
    <dialog id='meter-dialog'>
       <form method='dialog'>
-
          <label for='medidor' class='form-label'>Medidor</label>
          <input id='medidor' class='form-control' type='number' required placeholder='020318' name='medidor'>
 

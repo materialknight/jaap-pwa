@@ -19,6 +19,12 @@ class LocalStorageTable {
             case 'ó': return 'o'
             case 'ú': return 'u'
             case 'ñ': return 'n'
+            case 'Á': return 'A'
+            case 'É': return 'E'
+            case 'Í': return 'I'
+            case 'Ó': return 'O'
+            case 'Ú': return 'U'
+            case 'Ñ': return 'N'
          }
       })
    }
@@ -30,8 +36,9 @@ class LocalStorageTable {
       this.defaultOrder = defaultOrder
 
       this.table = null
-      this.switchBox = null
-      this.filterBox = null
+      this.searchBox = null
+      this.historySelect = null
+      this.visibleTBodyIndex = 0
 
       // Used by #_formatDates() and #_formatTRDates():
 
@@ -54,15 +61,56 @@ class LocalStorageTable {
       return this
    }
 
-   linkSwitchBox(columnSwitchesContainer) {
+   linkHistorySelect(historySelect) {
 
-      this.switchBox = columnSwitchesContainer
+      this.historySelect = historySelect
+
+      this.historySelect.addEventListener(
+         'change',
+         changeEv => this.show(changeEv.currentTarget.value),
+         { passive: true }
+      )
+
       return this
    }
 
-   linkFilterBox(filterBox) {
+   #_insertHistoryOptions() {
 
-      this.filterBox = filterBox
+      // Used by fillTable().
+
+      if (!this.historySelect)
+      {
+         console.warn('No history <option>s were inserted because no <select> element is linked!')
+         return this
+      }
+
+      this.historySelect.textContent = ''
+
+      for (let i = 0; i < this.history.length; ++i)
+      {
+         const option = document.createElement('option')
+         option.value = i
+         option.textContent = this.history.length - i
+         this.historySelect.append(option)
+      }
+
+      return this
+   }
+
+   linkFilter(filter) {
+
+      filter.addEventListener(
+         'input',
+         inputEv => this.#_filter(inputEv),
+         { passive: true }
+      )
+
+      return this
+   }
+
+   linkSearchBox(searchBox) {
+
+      this.searchBox = searchBox
       return this
    }
 
@@ -74,15 +122,20 @@ class LocalStorageTable {
    fillTable() {
 
       this.table.textContent = ''
-      this.defaultOrder ??= Object.keys(this.history[0])
+      this.defaultOrder ??= Object.keys(this.history[0][0])
+
+      if (this.historySelect)
+      {
+         this.#_insertHistoryOptions()
+      }
 
       return this.#_createTHead().#_createTBodies().#_formatDates()
    }
 
-   insertSwitches() {
+   insertSwitches(switchBox) {
 
-      this.switchBox.textContent = ''
-      this.defaultOrder ??= Object.keys(this.history[0])
+      switchBox.textContent = ''
+      this.defaultOrder ??= Object.keys(this.history[0][0])
 
       for (const col of this.defaultOrder)
       {
@@ -110,6 +163,7 @@ class LocalStorageTable {
             {
                td.hidden = td.hidden ? false : true
             }
+
          }, { passive: true })
 
          const label = document.createElement('label')
@@ -117,38 +171,10 @@ class LocalStorageTable {
          label.setAttribute('for', id)
          label.textContent = col
 
-         this.switchBox.append(checkbox, label)
+         switchBox.append(checkbox, label)
       }
 
       return this
-   }
-
-   filter(inputOrChangeEv) {
-
-      if (!this.filterBox)
-      {
-         throw "You must use linkFilterBox() before this function."
-      }
-
-      const soughtVal = this.constructor
-         .removeDiacritics(inputOrChangeEv.target.value)
-         .toLowerCase()
-
-      for (const row of this.table.rows)
-      {
-         const rowText = this.constructor
-            .removeDiacritics(row.textContent)
-            .toLowerCase()
-
-         if (rowText.includes(soughtVal))
-         {
-            row.hidden = false
-         }
-         else
-         {
-            row.hidden = true
-         }
-      }
    }
 
    save() {
@@ -168,9 +194,12 @@ class LocalStorageTable {
       }
    }
 
+   show(index) {
 
-
-   show(onlyOne = true, index = 0) {
+      if (index)
+      {
+         this.visibleTBodyIndex = index
+      }
 
       if (this.table)
       {
@@ -178,23 +207,15 @@ class LocalStorageTable {
 
          for (const tBody of this.table.tBodies)
          {
-            tBody.hidden = onlyOne
+            tBody.hidden = true
          }
 
-         if (onlyOne && this.table.tBodies[index])
-         {
-            this.table.tBodies[index].hidden = false
-         }
+         this.table.tBodies[this.visibleTBodyIndex].hidden = false
       }
 
-      if (this.switchBox)
+      if (this.searchBox)
       {
-         this.switchBox.hidden = false
-      }
-
-      if (this.filterBox)
-      {
-         this.filterBox.hidden = false
+         this.searchBox.hidden = false
       }
 
       for (const instance of this.constructor.instances)
@@ -206,39 +227,12 @@ class LocalStorageTable {
                instance.table.hidden = true
             }
 
-            if (instance.switchBox)
+            if (instance.searchBox)
             {
-               instance.switchBox.hidden = true
-            }
-
-            if (instance.filterBox)
-            {
-               instance.filterBox.hidden = true
+               instance.searchBox.hidden = true
             }
          }
       }
-   }
-
-   styleSwitches(checkboxCSSClasses = 'btn-check', labelCSSClasses = 'btn btn-outline-danger') {
-
-      if (this.switchBox.children.length === 0)
-      {
-         throw "You must use insertSwitches() before this function!"
-      }
-
-      for (const elem of this.switchBox.children)
-      {
-         if (elem.tagName === 'INPUT')
-         {
-            elem.classList.add(...checkboxCSSClasses.split(' '))
-         }
-         else
-         {
-            elem.classList.add(...labelCSSClasses.split(' '))
-         }
-      }
-
-      return this
    }
 
    loadCsv(readerLoadedFile) {
@@ -251,9 +245,32 @@ class LocalStorageTable {
       return this
    }
 
+   #_filter(inputOrChangeEv) {
+
+      const soughtVal = this.constructor
+         .removeDiacritics(inputOrChangeEv.target.value)
+         .toLowerCase()
+
+      for (const row of this.table.tBodies[this.visibleTBodyIndex].rows)
+      {
+         const rowText = this.constructor
+            .removeDiacritics(row.textContent)
+            .toLowerCase()
+
+         if (rowText.includes(soughtVal))
+         {
+            row.hidden = false
+         }
+         else
+         {
+            row.hidden = true
+         }
+      }
+   }
+
    #_formatTRDates(row) {
 
-      // Used by formatDates(), saveNewRow() and a submit listener in index.js.
+      // Used by #_formatDates().
 
       for (const cell of row.cells)
       {

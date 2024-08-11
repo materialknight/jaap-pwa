@@ -30,6 +30,8 @@ if ("serviceWorker" in navigator)
 import { LocalStorageTable } from './l-s-tables.js'
 import { getFormData } from './form-data.js'
 
+const mertersSectionBtn = document.getElementById('meters-section')
+
 const select = document.getElementById('history')
 
 const meterAddBtn = document.getElementById('meter-add-btn')
@@ -55,7 +57,7 @@ const lecturaInput = document.getElementById('meter-reading')
 // }
 
 const csvBtn = document.getElementById('csv-btn')
-const csvFilter = document.getElementById('csv-filter')
+// const csvFilter = document.getElementById('csv-filter')
 
 
 const meters = new LocalStorageTable(
@@ -70,56 +72,39 @@ const meters = new LocalStorageTable(
    ]
 )
    .linkTable(document.getElementById('meters-table'))
-   .linkSwitchBox(document.getElementById('meters-switches'))
-   .linkFilterBox(document.getElementById('meter-search'))
-   .insertSwitches()
-   .styleSwitches()
+   .linkSearchBox(document.getElementById('meter-search'))
+   .linkFilter(document.getElementById('meter-filter'))
+   .linkHistorySelect(document.getElementById('history'))
+   .insertSwitches(document.getElementById('meters-switches'))
    .fillTable()
 
 let csv = new LocalStorageTable()
    .linkTable(document.getElementById('csv-table'))
-   .linkSwitchBox(document.getElementById('csv-switches'))
-   .linkFilterBox(document.getElementById('csv-search'))
+   .linkSearchBox(document.getElementById('csv-search'))
 
 
 
 // Event listeners:
 
-select.addEventListener('change', changeEv => {
+// select.addEventListener('change', changeEv => {
 
-   const tBodyIndex = meters.table.tBodies.length - Number(changeEv.currentTarget.value)
-   meters.show(true, tBodyIndex)
-})
+//    const tBodyIndex = meters.table.tBodies.length - Number(changeEv.currentTarget.value)
+//    meters.visibleTBodyIndex = tBodyIndex
+
+//    // meters.show(true, tBodyIndex)
+//    meters.show(changeEv.currentTarget.value)
+// })
 
 // Add every tBody as an <option> for the <select> element and trigger the above listener {:
 
-for (let i = meters.table.tBodies.length; i > 0; --i)
-{
-   const option = document.createElement('option')
-   option.value = i
-   option.textContent = i
-   select.append(option)
-}
 
 select.dispatchEvent(new Event('change'))
 
 // }
 
-// metersBtn.addEventListener(
-//    'click',
-//    () => meters.show(),
-//    { passive: true }
-// )
-
 meterAddBtn.addEventListener(
    'click',
    () => meterDialog.showModal(),
-   { passive: true }
-)
-
-meterFilter.addEventListener(
-   'input',
-   inputEv => meters.filter(inputEv),
    { passive: true }
 )
 
@@ -226,21 +211,15 @@ csvBtn.addEventListener('change', changeEv => {
 
       csv
          .loadCsv(loadEv.target.result)
+         .linkFilter(document.getElementById('csv-filter'))
          .fillTable()
-         .insertSwitches()
-         .styleSwitches()
+         .insertSwitches(document.getElementById('csv-switches'))
          .show()
    }
 
    reader.readAsText(file)
 
 }, { passive: true })
-
-csvFilter.addEventListener(
-   'input',
-   inputEv => csv.filter(inputEv),
-   { passive: true }
-)
 
 // To limit the min lectura to the previously-taken lectura {
 
@@ -268,3 +247,4 @@ medidorBeingRead.addEventListener('change', changeEv => {
 
 // }
 
+mertersSectionBtn.addEventListener('click', () => meters.show())

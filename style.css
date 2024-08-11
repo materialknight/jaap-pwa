@@ -1,4 +1,4 @@
-body {
+/* body {
    background-color: palegoldenrod;
 }
 
@@ -8,4 +8,136 @@ nav {
 
 main {
    background-color: white;
+} */
+body {
+   font-family: system-ui, Arial, Helvetica, sans-serif;
+   font-size: large;
+}
+
+h1 {
+   font-size: 3.5vw;
+   text-align: center;
+}
+
+div {
+   display: flex;
+   /* width: max-content; */
+   flex-wrap: wrap;
+
+}
+
+[type=button],
+[type=submit] {
+   font-size: large;
+   padding: 0.2rem 0.8rem;
+}
+
+[for=csv-btn] {
+   padding: 0.2rem 0.8rem;
+}
+
+.section-btns>* {
+   border-radius: 5px 5px 0 0;
+}
+
+* {
+   border: 1px solid blue;
+   box-sizing: border-box;
+}
+
+nav {
+   position: sticky;
+   top: 0;
+   /* padding: 5px; */
+}
+
+th {
+   position: sticky;
+}
+
+tbody {
+
+   tr:nth-child(even) {
+      /* background-color: #e5fad5; */
+   }
+
+   tr:nth-child(odd) {
+      /* background-color: #fcf82c; */
+   }
+
+}
+
+table {
+   margin: auto;
+}
+
+dialog {
+   border-radius: 8px;
+}
+
+form {
+   display: flex;
+   flex-direction: column;
+   /* padding: 2rem; */
+}
+
+[type=search],
+[type=text],
+[type=number],
+[type=date] {
+
+   padding: 0.3rem 0.4rem;
+   /* border-radius: 3px; */
+}
+
+search:not([hidden]) {
+
+   display: flex;
+   flex-wrap: wrap;
+   row-gap: 0.5rem;
+
+   padding: 0.5rem;
+
+
+   &>* {
+      margin: auto;
+
+   }
+
+   &>label {
+      margin-right: 0;
+   }
+
+   .switch-box {
+
+      label {
+         background-color: white;
+         border: 2px solid #EA1F2D;
+         color: #EA1F2D;
+         padding: 0.3rem 1rem;
+
+         &:first-of-type {
+            border-radius: 5px 0 0 5px;
+         }
+
+         &:last-of-type {
+            border-radius: 0 5px 5px 0;
+         }
+      }
+
+      [type=checkbox] {
+
+         display: none;
+
+         &:checked+label {
+            background-color: #EA1F2D;
+            color: white;
+         }
+      }
+   }
+}
+
+select {
+   width: 3rem;
+   /* height: 3rem; */
 }
