@@ -20,7 +20,7 @@
    <h1>Registro de la Junta Administradora de Agua Potable</h1>
 
    <nav>
-      <div class='section-btns'>
+      <div>
 
          <input type='button' value='medidores' id='meters-section'>
 
@@ -31,11 +31,15 @@
 
       <search id='meter-search' hidden>
 
-         <label for='history'>Tabla</label>
-         <select id='history'></select>
+         <div>
+            <label for='history'>Tabla</label>
+            <select id='history'></select>
+         </div>
 
-         <label for='meter-filter'>Filtrar</label>
-         <input id='meter-filter' type='search' spellcheck='false'>
+         <div>
+            <label for='meter-filter'>Filtrar</label>
+            <input id='meter-filter' type='search' spellcheck='false' size='18'>
+         </div>
 
          <input type='button' id='meter-add-btn' value='+ medidor'>
          <input type='button' id='reading-btn' value='+ lectura'>
@@ -46,8 +50,10 @@
 
       <search id='csv-search' hidden>
 
-         <label for='csv-filter'>Filtrar </label>
-         <input id='csv-filter' type='search' spellcheck='false'>
+         <div>
+            <label for='csv-filter'>Filtrar</label>
+            <input id='csv-filter' type='search' spellcheck='false' size='18'>
+         </div>
 
          <div class='switch-box' id='csv-switches'></div>
 
@@ -61,28 +67,28 @@
 
    <dialog id='meter-dialog'>
       <form method='dialog'>
-         <label for='medidor' class='form-label'>Medidor</label>
+         <label for='medidor' class='form-label'>medidor</label>
          <input id='medidor' class='form-control' type='number' required placeholder='020318' name='medidor'>
 
-         <label for='zona' class='form-label'>Zona</label>
+         <label for='zona' class='form-label'>zona</label>
          <input id='zona' class='form-control' type='number' required min='1' max='12' placeholder='7' name='zona'>
 
-         <label for='titular' class='form-label'>Titular</label>
+         <label for='titular' class='form-label'>titular</label>
          <input id='titular' class='form-control' type='text' required placeholder='José López' name='titular'>
 
-         <label for='caserío' class='form-label'>Caserío</label>
+         <label for='caserío' class='form-label'>caserío</label>
          <input id='caserío' class='form-control' type='text' required placeholder='La Profética' name='caserío'>
 
-         <label for='lectura' class='form-label'>Lectura inicial</label>
+         <label for='lectura' class='form-label'>lectura inicial</label>
          <input id='lectura' class='form-control' type='number' required min='0' value='0' name='lectura'>
 
-         <label for='fecha' class='form-label'>Fecha de lectura inicial</label>
+         <label for='fecha' class='form-label'>fecha de lectura inicial</label>
          <input id='fecha' class='form-control' type='date' required name='fecha'>
 
          <!-- <label for='deuda' class='form-label'>Deuda</label>
          <input id='deuda' class='form-control' type='number' required min='0' step='0.01' value='0'> -->
 
-         <input type='submit' value='Agregar medidor'>
+         <input type='submit' value='Agregar'>
          <input type='button' value='Cancelar' onclick='this.parentElement.parentElement.close()'>
       </form>
    </dialog>
