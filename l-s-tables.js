@@ -1,6 +1,6 @@
 'use strict'
 
-import { csvParse } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
+import { csvParse, csvFormat } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 
 class LocalStorageTable {
 
@@ -37,7 +37,11 @@ class LocalStorageTable {
 
       this.table = null
       this.searchBox = null
+      this.hasFilter = false
+
       this.historySelect = null
+      this.csvDownload = null
+
       this.visibleTBodyIndex = 0
 
       // Used by #_formatDates() and #_formatTRDates():
@@ -57,11 +61,23 @@ class LocalStorageTable {
 
    linkTable(table) {
 
+      if (this.table)
+      {
+         console.warn("linkTable() should only be called once per LocalStorageTable!")
+         return this
+      }
+
       this.table = table
       return this
    }
 
    linkHistorySelect(historySelect) {
+
+      if (this.historySelect)
+      {
+         console.warn("linkHistorySelect() should only be called once per LocalStorageTable!")
+         return this
+      }
 
       this.historySelect = historySelect
 
@@ -70,6 +86,36 @@ class LocalStorageTable {
          changeEv => this.show(changeEv.currentTarget.value),
          { passive: true }
       )
+
+      return this
+   }
+
+   linkCsvDownloadBtn(csvDownloadBtn) {
+
+      if (this.csvDownload)
+      {
+         console.warn('linkDownloadBtn() should only be called once per LocalStorageTable!')
+      }
+      else
+      {
+         this.csvDownload = csvDownloadBtn
+
+         this.csvDownload.addEventListener('click', () => {
+
+            const csvDoc = csvFormat(this.history[this.visibleTBodyIndex])
+            const link = document.createElement('a')
+
+            link.href = URL.createObjectURL(new Blob(
+               [csvDoc],
+               { type: 'text/csv', endings: 'native' }
+            ))
+
+            link.download = 'tabla.csv'
+            link.click()
+            URL.revokeObjectURL(link.href)
+
+         }, { passive: true })
+      }
 
       return this
    }
@@ -99,6 +145,14 @@ class LocalStorageTable {
 
    linkFilter(filter) {
 
+      if (this.hasFilter)
+      {
+         console.warn("linkFilter() should only be called once per LocalStorageTable!")
+         return this
+      }
+
+      this.hasFilter = true
+
       filter.addEventListener(
          'input',
          inputEv => this.#_filter(inputEv),
@@ -109,6 +163,12 @@ class LocalStorageTable {
    }
 
    linkSearchBox(searchBox) {
+
+      if (this.searchBox)
+      {
+         console.warn("linkSearchBox() should only be called once per LocalStorageTable!")
+         return this
+      }
 
       this.searchBox = searchBox
       return this

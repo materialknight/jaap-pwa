@@ -1,7 +1,7 @@
 'use strict'
 
-const CURRENT_CACHE = 'v0.1.8'
-const OLD_CACHE = 'v0.1.7'
+const CURRENT_CACHE = 'v0.1.9'
+const OLD_CACHE = 'v0.1.8'
 
 addEventListener('install', event => {
 
@@ -13,6 +13,7 @@ addEventListener('install', event => {
          .then(cache => cache.addAll([
             './',
             './index.html',
+            './style.css',
             './app.js',
             './l-s-tables.js',
             './form-data.js',

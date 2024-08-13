@@ -1,5 +1,7 @@
 'use strict'
 
+import { csvParse, csvFormat } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
+
 // Migration {
 
 let oldData = JSON.parse(localStorage.getItem('meters'));
@@ -75,14 +77,13 @@ const meters = new LocalStorageTable(
    .linkSearchBox(document.getElementById('meter-search'))
    .linkFilter(document.getElementById('meter-filter'))
    .linkHistorySelect(document.getElementById('history'))
+   .linkCsvDownloadBtn(document.getElementById('export-csv'))
    .insertSwitches(document.getElementById('meters-switches'))
    .fillTable()
 
 let csv = new LocalStorageTable()
    .linkTable(document.getElementById('csv-table'))
    .linkSearchBox(document.getElementById('csv-search'))
-
-
 
 // Event listeners:
 
