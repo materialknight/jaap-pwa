@@ -57,22 +57,22 @@ table {
    th,
    td {
       padding: 0.2rem 0;
+      /* border: 1px solid black; */
    }
 
-   tbody+tbody {
-      tr:nth-child(odd) {
-         border: 1px solid black;
-         background-color: lightcoral;
-      }
-   }
-
-   tbody:first-of-type {
+   tbody {
       tr:nth-child(odd) {
          border: 1px solid black;
          background-color: lightgreen;
       }
    }
 
+   tbody.non-first {
+      tr:nth-child(odd) {
+         /* border: 1px solid black; */
+         background-color: lightcoral;
+      }
+   }
 }
 
 dialog {
@@ -136,10 +136,6 @@ search:not([hidden]) {
       background-color: snow;
 
       color: #EA1F2D;
-      /* padding: 0.3rem 1rem; */
-      /* flex: 0 0 7rem; */
-      /* min-width: 4rem; */
-
 
       &:first-of-type {
          border-left: 1px solid black;
