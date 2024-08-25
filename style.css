@@ -8,6 +8,7 @@ body {
    font-size: large;
    margin: 0;
    background-color: whitesmoke;
+   min-width: min-content;
 }
 
 h1 {
@@ -29,6 +30,14 @@ select {
    padding: 0.3rem 0.7rem;
    border-radius: 3px;
    border: 1px solid black;
+
+   &:hover {
+      background-color: aquamarine;
+   }
+
+   &:active {
+      background-color: cyan;
+   }
 }
 
 nav {
@@ -71,6 +80,14 @@ table {
       tr:nth-child(odd) {
          /* border: 1px solid black; */
          background-color: lightcoral;
+      }
+   }
+
+   &#fees-table {
+
+      th,
+      td {
+         border: 1px solid black;
       }
    }
 }
@@ -119,6 +136,7 @@ search:not([hidden]) {
 
    label {
       padding: 0.3rem 0.4rem;
+      min-width: max-content;
    }
 
 }
@@ -145,11 +163,20 @@ search:not([hidden]) {
       &:last-of-type {
          border-radius: 0 3px 3px 0;
       }
+
+      &:hover {
+         background-color: aquamarine;
+      }
    }
 
    [type=checkbox]:checked+label {
       background-color: #EA1F2D;
       color: white;
+
+      &:hover {
+         background-color: aquamarine;
+         color: black;
+      }
    }
 
    [type=checkbox] {

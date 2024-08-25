@@ -2,6 +2,7 @@
 
 import { csvParse, csvFormat } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 import { getFormData } from './form-data.js'
+import { Show_Btn, insert_switches, fill_table, filter_input, handle_db_err, remove_diacritics } from './core-funcs.js'
 
 // Migration {
 
@@ -74,26 +75,49 @@ const initial_date = document.getElementById('fecha-inicial')
 const measurement_date = document.getElementById('fecha-lectura-actual')
 // }
 
+const fees_table = document.getElementById('fees-table')
+const fees_section_b = document.getElementById('fees-section')
+const fees_searchbox = document.getElementById('fees-search')
+
+const iframe = document.getElementById('receipt')
+
 const csv_b = document.getElementById('csv-btn')
 const csv_table = document.getElementById('csv-table')
 const csv_filter = document.getElementById('csv-filter')
 const csv_switchbox = document.getElementById('csv-switches')
 const csv_searchbox = document.getElementById('csv-search')
-const csv_dl_b = document.getElementById('export-csv')
 
 const csv = {
    current: { data: null }
 }
 
-const json_dl_b = document.getElementById('export-json')
+const dl_meters_csv_b = document.getElementById('export-meters-csv')
+const dl_meters_json_b = document.getElementById('export-meters-json')
+
+const print_b = document.getElementById('print-btn')
+
 
 const open_req = indexedDB.open('meters', 1)
 let db = null
+let fees = null
 
 
 open_req.onerror = handle_db_err
 
 open_req.onupgradeneeded = upgrade_needed_ev => {
+
+   localStorage.setItem(
+      'fees',
+      JSON.stringify([
+         { mínimo: 0, máximo: 6, fórmula: '2.61' },
+         { mínimo: 7, máximo: 40, fórmula: '0.25 * consumo + 1.60' },
+         { mínimo: 41, máximo: 50, fórmula: '0.40 * (consumo - 40) + 10 + 1.60' },
+         { mínimo: 51, máximo: 100, fórmula: '0.75 * consumo + 1.60' },
+         { mínimo: 101, máximo: 150, fórmula: '1.00 * consumo + 1.60' },
+         { mínimo: 151, máximo: 200, fórmula: '1.25 * consumo + 1.60' },
+         { mínimo: 201, máximo: null, fórmula: '1.50 * consumo + 1.60' }
+      ])
+   )
 
    const db = upgrade_needed_ev.target.result
 
@@ -117,7 +141,34 @@ open_req.onsuccess = success_ev => {
    db.onerror = handle_db_err
 
    update_select()
+   fees = JSON.parse(localStorage.getItem('fees'))
+   fill_table(fees_table, fees, ['mínimo', 'máximo', 'fórmula'])
 }
+
+print_b.addEventListener('click', () => {
+
+   iframe.contentWindow.focus()
+   iframe.contentWindow.print();
+}, { passive: true })
+
+meters_table.addEventListener('click', click_ev => {
+
+   const clicked_row = click_ev.target.closest('tr')
+
+   if (!clicked_row) return
+
+   const meter = clicked_row.querySelector('.medidor').textContent
+   const data_row = meters.current.data.find(row => row.medidor === meter)
+
+   const span = document.createElement('span')
+   span.textContent = JSON.stringify(data_row)
+
+   iframe.contentDocument.body.append(span)
+
+
+   iframe.parentElement.parentElement.showModal()
+
+})
 
 table_select.addEventListener('change', changeEv => {
 
@@ -200,15 +251,7 @@ meter_filter.addEventListener(
    { passive: true }
 )
 
-meters_section_b.addEventListener('click', () => {
-
-   csv_table.hidden = true
-   csv_searchbox.hidden = true
-
-   meters_table.hidden = false
-   meters_searchbox.hidden = false
-
-}, { passive: true })
+new Show_Btn(meters_section_b, meters_table, meters_searchbox)
 
 add_reading_b.addEventListener('click', () => {
 
@@ -302,15 +345,7 @@ new_reading_f.addEventListener('submit', submit_ev => {
 
 })
 
-csv_section_b.addEventListener('click', () => {
-
-   csv_table.hidden = false
-   csv_searchbox.hidden = false
-
-   meters_table.hidden = true
-   meters_searchbox.hidden = true
-
-}, { passive: true })
+new Show_Btn(csv_section_b, csv_table, csv_searchbox)
 
 csv_b.addEventListener('change', change_ev => {
 
@@ -341,7 +376,6 @@ csv_b.addEventListener('change', change_ev => {
    }
 
    reader.readAsText(file)
-
 })
 
 csv_filter.addEventListener(
@@ -350,7 +384,7 @@ csv_filter.addEventListener(
    { passive: true }
 )
 
-csv_dl_b.addEventListener('click', () => {
+dl_meters_csv_b.addEventListener('click', () => {
 
    const csv_doc = csvFormat(meters_table.hidden ? csv.current.data : meters.current.data)
    const link = document.createElement('a')
@@ -366,7 +400,7 @@ csv_dl_b.addEventListener('click', () => {
 
 }, { passive: true })
 
-json_dl_b.addEventListener('click', () => {
+dl_meters_json_b.addEventListener('click', () => {
 
    const json_data = JSON.stringify(meters_table.hidden ? csv.current.data : meters.current.data, null, 3)
    const link = document.createElement('a')
@@ -381,6 +415,13 @@ json_dl_b.addEventListener('click', () => {
    URL.revokeObjectURL(link.href)
 
 }, { passive: true })
+
+
+new Show_Btn(fees_section_b, fees_table, fees_searchbox)
+
+// const consumo = 20
+// const formula = fees.find(row => row.mínimo >= consumo && (row.máximo ?? Number.MAX_SAFE_INTEGER) <= consumo)
+// console.log(eval(formula))
 
 //* FUNCTIONS:
 
@@ -400,7 +441,6 @@ function fill_datalist(datalist, col_key) {
    {
       const option = document.createElement('option')
       option.value = unique_val
-      console.log(option)
       datalist.append(option)
    }
 }
@@ -437,139 +477,4 @@ function update_select() {
       }
 
    }
-}
-
-function insert_switches(switchBox, table, def_col_order) {
-
-   switchBox.textContent = ''
-
-   for (const col of def_col_order)
-   {
-      const controlled_class = remove_diacritics(col).replaceAll(' ', '-').toLowerCase()
-
-      // Below, Math.random() is necessary because otherwise, if 2 tables in the DOM had a column with the same name, their corresponding switches would have the same id, which will cause undefined behavior!
-
-      const id = controlled_class.concat(Math.random())
-      const checkbox = document.createElement('input')
-
-      checkbox.setAttribute('type', 'checkbox')
-      checkbox.setAttribute('checked', '')
-      checkbox.setAttribute('id', id)
-      checkbox.setAttribute('data-class', controlled_class)
-
-      checkbox.addEventListener('change', change_ev => {
-
-         const controlled_class = change_ev.target.getAttribute('data-class')
-         const column = table.querySelectorAll('.'.concat(controlled_class))
-
-         for (const td of column)
-         {
-            td.hidden = td.hidden ? false : true
-         }
-
-      }, { passive: true })
-
-      const label = document.createElement('label')
-
-      label.setAttribute('for', id)
-      label.textContent = col.replaceAll('_', ' ')
-
-      switchBox.append(checkbox, label)
-   }
-}
-
-function fill_table(table, table_data, def_col_order) {
-
-   table.textContent = ''
-
-   const thead_row = table.createTHead().insertRow()
-
-   for (const col of def_col_order)
-   {
-      const th = document.createElement('th')
-      th.className = remove_diacritics(col).replaceAll(' ', '-')
-      th.textContent = col.replaceAll('_', ' ')
-      thead_row.appendChild(th)
-   }
-
-   const tbody = table.createTBody()
-
-   for (const row_data of table_data)
-   {
-      const tr = tbody.insertRow()
-
-      for (const col of def_col_order)
-      {
-         const td = tr.insertCell()
-         td.className = remove_diacritics(col).replaceAll(' ', '-')
-
-         let datum = row_data[col]
-         const datum_as_date = new Date(datum)
-         const datum_is_date = typeof datum === 'number' && datum.toString().length === 13 && !isNaN(datum_as_date)
-
-         if (datum_is_date)
-         {
-            datum = datum_as_date.toLocaleDateString('es', {
-               day: 'numeric',
-               year: 'numeric',
-               month: 'short',
-               timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-            })
-         }
-
-         td.textContent = datum
-      }
-   }
-}
-
-function filter_input(table, input_ev) {
-
-   const sought_val = remove_diacritics(input_ev.target.value).toLowerCase()
-   const tbody = table.tBodies[0]
-
-   if (!tbody)
-   {
-      return
-   }
-
-   for (const row of tbody.rows)
-   {
-      const row_text = remove_diacritics(
-         Array
-            .from(row.cells)
-            .map(cell => cell.textContent)
-            .join(' ')
-      )
-         .toLowerCase()
-
-      row.hidden = row_text.includes(sought_val) ? false : true
-   }
-}
-
-
-function handle_db_err(err) {
-   console.error(err)
-   alert('Ha ocurrido un error, abra la consola para más detalles!')
-}
-
-function remove_diacritics(str) {
-
-   return str.replaceAll(/[áéíóúñ]/g, char => {
-
-      switch (char)
-      {
-         case 'á': return 'a'
-         case 'é': return 'e'
-         case 'í': return 'i'
-         case 'ó': return 'o'
-         case 'ú': return 'u'
-         case 'ñ': return 'n'
-         case 'Á': return 'A'
-         case 'É': return 'E'
-         case 'Í': return 'I'
-         case 'Ó': return 'O'
-         case 'Ú': return 'U'
-         case 'Ñ': return 'N'
-      }
-   })
 }

@@ -23,6 +23,7 @@
       <div>
 
          <input type='button' value='medidores' id='meters-section'>
+         <input type='button' value='tarifas' id='fees-section'>
          <input type='button' value='csv' id='csv-section'>
 
       </div>
@@ -41,10 +42,17 @@
 
          <input type='button' id='meter-add-btn' value='+ medidor'>
          <input type='button' id='reading-btn' value='+ lectura'>
-         <input type='button' value='&#8628; .csv' id='export-csv'>
-         <input type='button' value='&#8628; .json' id='export-json'>
+         <input type='button' value='&#8628; .csv' id='export-meters-csv'>
+         <input type='button' value='&#8628; .json' id='export-meters-json'>
 
          <div class='switch-box' id='meters-switches'></div>
+
+      </search>
+
+      <search id='fees-search' hidden>
+
+         <input type='button' value='&#8628; .csv' id='export-fees-csv'>
+         <input type='button' value='&#8628; .json' id='export-fees-json'>
 
       </search>
 
@@ -177,9 +185,19 @@
    </dialog>
 
    <!-- todo: error fecha de toma de medida less than previous one -->
+
+   <dialog>
+      <form method='dialog' id='print-form'>
+         <iframe src='./receipt.html' id='receipt'></iframe>
+         <input type='button' value='imprimir' id='print-btn'>
+         <input type='submit' value='cancelar'>
+      </form>
+   </dialog>
+
    <main>
-      <table id='meters-table' class='table table-striped table-bordered'></table>
-      <table id='csv-table' class='table table-striped table-bordered' hidden></table>
+      <table id='meters-table'></table>
+      <table id='fees-table' hidden></table>
+      <table id='csv-table' hidden></table>
    </main>
 </body>
 
