@@ -1,5 +1,4 @@
 * {
-   /* border: 1px solid blue; */
    box-sizing: border-box;
 }
 
@@ -30,6 +29,7 @@ select {
    padding: 0.3rem 0.7rem;
    border-radius: 3px;
    border: 1px solid black;
+   cursor: pointer;
 
    &:hover {
       background-color: aquamarine;
@@ -37,6 +37,14 @@ select {
 
    &:active {
       background-color: cyan;
+   }
+
+   &:disabled {
+      cursor: not-allowed;
+
+      &:hover {
+         background-color: ghostwhite;
+      }
    }
 }
 
@@ -48,6 +56,17 @@ nav {
 th {
    position: sticky;
    top: auto;
+
+   cursor: pointer;
+
+   &:hover {
+      background-color: aquamarine;
+   }
+
+   &:active {
+      background-color: cyan;
+   }
+
 
 }
 
@@ -74,12 +93,20 @@ table {
          border: 1px solid black;
          background-color: lightgreen;
       }
+
+      tr:nth-child(even) {
+         background-color: whitesmoke;
+      }
    }
 
    tbody.non-first {
       tr:nth-child(odd) {
-         /* border: 1px solid black; */
+         border: 1px solid black;
          background-color: lightcoral;
+      }
+
+      tr:nth-child(even) {
+         background-color: whitesmoke;
       }
    }
 
@@ -131,7 +158,10 @@ search:not([hidden]) {
    padding: 0.8rem 0;
    background-color: beige;
 
-   border: 1px solid black;
+   /* border: 1px solid black; */
+   border-left: 1px solid black;
+   border-right: 1px solid black;
+   border-bottom: 1px solid black;
    border-radius: 0 3px 3px 3px;
 
    label {
@@ -147,6 +177,8 @@ search:not([hidden]) {
    border-radius: 3px;
 
    label {
+      cursor: pointer;
+
       border-right: 1px solid black;
       border-top: 1px solid black;
       border-bottom: 1px solid black;
@@ -188,4 +220,50 @@ select {
    min-width: fit-content;
    padding: 0 0.2rem;
    align-self: normal;
+}
+
+#help-search {
+
+   div {
+      flex-direction: column;
+   }
+
+   [type=number] {
+      width: 6rem;
+   }
+}
+
+#num-recibo {
+   line-height: 1.9rem;
+
+   [type=number] {
+      width: 7rem;
+   }
+
+   div {
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+      row-gap: 0.8rem;
+
+      &>div {
+         flex-grow: 1;
+      }
+
+      label {
+         min-width: max-content;
+      }
+   }
+}
+
+.active-section {
+   background-color: beige;
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+   border-bottom: none;
+}
+
+.filler-tab {
+   width: 100%;
+   align-self: stretch;
+   border-bottom: 1px solid black;
 }

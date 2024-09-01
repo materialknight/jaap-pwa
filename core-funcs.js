@@ -8,15 +8,25 @@ class Show_Btn {
 
    constructor(show_btn, table, searchbox) {
 
+      this.show_btn = show_btn
       this.table = table
       this.searchbox = searchbox
 
-      show_btn.addEventListener('click', () => {
+      this.show_btn.addEventListener('click', () => {
 
          for (const instance of this.constructor.instances)
          {
-            instance.table.hidden = instance !== this
-            instance.searchbox.hidden = instance !== this
+            if (instance === this)
+            {
+               instance.show_btn.classList.add('active-section')
+               instance.table.hidden = false
+               instance.searchbox.hidden = false
+               continue
+            }
+
+            instance.show_btn.classList.remove('active-section')
+            instance.table.hidden = true
+            instance.searchbox.hidden = true
          }
 
       }, { passive: true })
@@ -46,7 +56,7 @@ function insert_switches(switchBox, table, def_col_order) {
       checkbox.addEventListener('change', change_ev => {
 
          const controlled_class = change_ev.target.getAttribute('data-class')
-         const column = table.querySelectorAll('.'.concat(controlled_class))
+         const column = table.querySelectorAll(`[data-class=${controlled_class}]`)
 
          for (const td of column)
          {
@@ -64,16 +74,105 @@ function insert_switches(switchBox, table, def_col_order) {
    }
 }
 
-function fill_table(table, table_data, def_col_order) {
+function th_sort_meters(table) {
+
+   const THs = table.getElementsByTagName('th')
+   const tbody = table.tBodies[0]
+   const rows = Array.from(tbody.rows)
+
+   const data_types = { medidor: 'string', zona: 'number', titular: 'string', caserio: 'string', lectura_anterior: 'number', desde: 'number', lectura_actual: 'number', hasta: 'number', recibo: 'number' }
+
+   for (const th of THs)
+   {
+      th.setAttribute('data-row-order', 'default')
+
+      const col = th.getAttribute('data-class')
+      const col_data_type = data_types[col]
+
+      if (col_data_type === 'number')
+      {
+         th.addEventListener('click', () => {
+
+            const row_order_ascending = th.getAttribute('data-row-order') === 'ascending'
+
+            if (row_order_ascending)
+            {
+               th.setAttribute('data-row-order', 'descending')
+            } else
+            {
+               th.setAttribute('data-row-order', 'ascending')
+            }
+
+            rows.sort((row_a, row_b) => {
+
+               const num_a = Number(Array
+                  .from(row_a.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .textContent)
+
+               const num_b = Number(Array
+                  .from(row_b.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .textContent)
+
+               return row_order_ascending ? num_a[col] - num_b[col] : num_b[col] - num_a[col]
+            })
+
+            tbody.textContent = ''
+            tbody.append(...rows)
+         })
+      } else if (col_data_type === 'string')
+      {
+         th.addEventListener('click', () => {
+
+            const row_order_ascending = th.getAttribute('data-row-order') === 'ascending'
+
+            if (row_order_ascending)
+            {
+               th.setAttribute('data-row-order', 'descending')
+            } else
+            {
+               th.setAttribute('data-row-order', 'ascending')
+            }
+
+            rows.sort((row_a, row_b) => {
+
+               const str_a = Array
+                  .from(row_a.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .textContent
+                  .toLowerCase()
+
+               const str_b = Array
+                  .from(row_b.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .textContent
+                  .toLowerCase()
+
+               if (str_a < str_b) return row_order_ascending ? -1 : 1
+               if (str_a > str_b) return row_order_ascending ? 1 : -1
+
+               return 0
+            })
+
+            tbody.textContent = ''
+            tbody.append(...rows)
+         })
+      }
+   }
+}
+
+function fill_table(table, table_data, col_order) {
 
    table.textContent = ''
 
    const thead_row = table.createTHead().insertRow()
 
-   for (const col of def_col_order)
+   for (const col of col_order)
    {
       const th = document.createElement('th')
-      th.className = remove_diacritics(col).replaceAll(' ', '-')
+      th.setAttribute('data-class', remove_diacritics(col).replaceAll(' ', '-'))
+      th.setAttribute('data-row-order', 'default')
       th.textContent = col.replaceAll('_', ' ')
       thead_row.appendChild(th)
    }
@@ -84,12 +183,14 @@ function fill_table(table, table_data, def_col_order) {
    {
       const tr = tbody.insertRow()
 
-      for (const col of def_col_order)
+      for (const col of col_order)
       {
          const td = tr.insertCell()
-         td.className = remove_diacritics(col).replaceAll(' ', '-')
+         td.setAttribute('data-class', remove_diacritics(col).replaceAll(' ', '-'))
 
          let datum = row_data[col]
+         td.setAttribute('data-value', datum)
+
          const datum_as_date = new Date(datum)
          const datum_is_date = typeof datum === 'number' && datum.toString().length === 13 && !isNaN(datum_as_date)
 
@@ -131,7 +232,6 @@ function filter_input(table, input_ev) {
       row.hidden = row_text.includes(sought_val) ? false : true
    }
 }
-
 
 function handle_db_err(err) {
    console.error(err)

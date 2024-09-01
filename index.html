@@ -22,10 +22,11 @@
    <nav>
       <div>
 
-         <input type='button' value='medidores' id='meters-section'>
+         <input type='button' value='medidores' id='meters-section' class='active-section'>
          <input type='button' value='tarifas' id='fees-section'>
          <input type='button' value='csv' id='csv-section'>
-
+         <input type='button' value='ayuda' id='help-section'>
+         <div class='filler-tab'></div>
       </div>
 
       <search id='meter-search'>
@@ -70,6 +71,15 @@
 
       </search>
 
+      <search id='help-search' hidden>
+         <div>
+            <p>n° del 1er recibo: <span id='num-first-receipt'></span></p>
+            <input type='button' id='set-receipt-btn' value='cambiar'>
+            <p>siguiente n° de recibo: <span id='num-next-receipt'></span></p>
+         </div>
+
+      </search>
+
    </nav>
 
    <!-- Meter-registration dialogs: -->
@@ -82,7 +92,7 @@
          <input id='medidor' class='form-control' type='number' required placeholder='020318' name='medidor'>
 
          <label for='zona' class='form-label'>zona</label>
-         <input id='zona' class='form-control' type='number' required min='1' max='12' placeholder='7' name='zona'>
+         <input id='zona' class='form-control' type='number' required min='1' max='14' placeholder='7' name='zona'>
 
          <label for='titular' class='form-label'>titular</label>
          <input id='titular' class='form-control' type='text' required placeholder='José María López Rivera'
@@ -114,7 +124,7 @@
    <dialog>
       <form method='dialog' id='meter-added-form'>
          <p>Medidor agregado exitosamente!</p>
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
       </form>
    </dialog>
 
@@ -123,7 +133,7 @@
    <dialog>
       <form method='dialog' id='meter-error-form'>
          <p>Error: El medidor <span id='meter-repeated'></span> ya existe!</p>
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
       </form>
    </dialog>
 
@@ -144,7 +154,7 @@
          <label for='fecha-lectura-actual' class='form-label'>fecha de lectura</label>
          <input id='fecha-lectura-actual' class='form-control' type='date' required name='hasta'>
 
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
          <input type='button' value='Cancelar' onclick='this.parentElement.parentElement.close()'>
       </form>
    </dialog>
@@ -154,7 +164,7 @@
    <dialog>
       <form method='dialog' id='read-confirm-form'>
          <p>Lectura tomada exitosamente!</p>
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
       </form>
    </dialog>
 
@@ -163,7 +173,7 @@
    <dialog>
       <form method='dialog' id='meter-non-existant-form'>
          <p>El medidor <span id='non-existant-meter'></span> aún no está registrado!</p>
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
       </form>
    </dialog>
 
@@ -180,24 +190,79 @@
          <p>2- Borrar los medidores no leídos de la tabla actual.</p>
          <p>Si borra los medidores no leídos, estos no aparecerán en la tabla del siguiente periodo, y si necesita
             leerlos en el futuro, tendrá que volver a registrarlos.</p>
-         <input type='submit' value='Ok'>
+         <input type='submit' value='OK'>
       </form>
    </dialog>
 
-   <!-- todo: error fecha de toma de medida less than previous one -->
+   <!-- Error: "desde" debe ser menor que "hasta". -->
+   <dialog>
+      <form method='dialog' id='err-desde-hasta'>
+         <p>Error: La nueva lectura debe ser realizada al menos 1 día después que la anterior!</p>
+         <input type='submit' value='OK'>
+      </form>
+   </dialog>
+
+   <!-- Error: "lectura anterior" no debe ser mayor que "lectura actual". -->
+   <!-- TODO: ¿Qué pasa cuando se resetea un medidor? Respuesta: El usuario debe editar la fila -->
+   <dialog>
+      <form method='dialog' id='err-lecturas'>
+         <p>Error: La nueva lectura no puede ser menor que la anterior!</p>
+         <input type='submit' value='OK'>
+      </form>
+   </dialog>
+
+   <!-- Elegir el n° del 1er recibo: -->
 
    <dialog>
-      <form method='dialog' id='print-form'>
-         <iframe src='./receipt.html' id='receipt'></iframe>
-         <input type='button' value='imprimir' id='print-btn'>
-         <input type='submit' value='cancelar'>
+      <form method='dialog' id='num-recibo'>
+         <p>Antes de registrar el 1er medidor, elija el n° del 1er recibo, y asegúrese de que sea el correcto, porque
+            después de
+            tomar la 1a lectura (con el botón <span
+               style='border: 1px solid black; border-radius: 3px; padding: 0.3rem 0.7rem'>+
+               lectura</span>), ya no podrá
+            cambiarlo!</p>
+         <div>
+            <div>
+               <label for='first_receipt'>n° del 1er recibo:</label>
+               <input id='first_receipt' type='number' min='0' name='first_receipt' required>
+            </div>
+            <div>
+               <input type='submit' value='Confirmar'>
+               <input type='button' value='Cancelar' onclick='this.closest("dialog").close()'>
+            </div>
+         </div>
+         <p>Nota: Mientras aún no tome la 1a lectura, puede cambiar el n° del 1er recibo en la sección de ayuda.</p>
       </form>
    </dialog>
+
+   <!-- Error: El n° del 1er recibo ya no puede cambiarse.  -->
+
+   <dialog>
+      <form method='dialog' id='err-num-recibo'>
+         <p>Error: Ya no puede cambiar el n° del 1er recibo!</p>
+         <p>Solo podía cambiarlo antes de registrar la 1a "lectura actual".</p>
+         <p>Si necesita cambiar el n° del 1er recibo, póngase en contacto con el desarrollador de esta aplicación.</p>
+         <input type='submit' value='OK'>
+      </form>
+   </dialog>
+
+   <dialog>
+      <form method='dialog' id='print-edit-dialog'>
+
+      </form>
+   </dialog>
+
+   <!-- todo: error prioridad 1-> usuario debe confirmar que "medida anterior" sea igual a "lectura actual" -->
+
+   <!-- todo: error prioridad 2-> "desde" no debe ser mayor que hoy -->
+   <!-- todo: error prioridad 2-> "hasta" no debe ser mayor que hoy -->
+
 
    <main>
       <table id='meters-table'></table>
       <table id='fees-table' hidden></table>
       <table id='csv-table' hidden></table>
+      <article id='user-guide' hidden></article>
    </main>
 </body>
 

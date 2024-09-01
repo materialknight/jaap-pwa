@@ -7,7 +7,7 @@ import { Show_Btn, insert_switches, fill_table, filter_input, handle_db_err, rem
 // Migration {
 
 // todo: delete all data of the previous data model.
-// todo: implement windows.onerror.
+// todo: implement window.onerror.
 
 let oldData = JSON.parse(localStorage.getItem('meters'));
 
@@ -36,6 +36,13 @@ if ("serviceWorker" in navigator)
 
 const meters_section_b = document.getElementById('meters-section')
 const csv_section_b = document.getElementById('csv-section')
+const help_section_b = document.getElementById('help-section')
+
+const num_recibo_f = document.getElementById('num-recibo')
+const set_receipt_b = document.getElementById('set-receipt-btn')
+const err_receipt_f = document.getElementById('err-num-recibo')
+const num_first_receipt = document.getElementById('num-first-receipt')
+const num_next_receipt = document.getElementById('num-next-receipt')
 
 const table_select = document.getElementById('history')
 const meters_table = document.getElementById('meters-table')
@@ -56,6 +63,8 @@ const no_such_meter_f = document.getElementById('meter-non-existant-form')
 const non_existant_meter = document.getElementById('non-existant-meter')
 const meter_already_read_f = document.getElementById('meter-already-read-form')
 const already_read_meter = document.querySelectorAll('.already-read-meter')
+const err_desde_hasta_f = document.getElementById('err-desde-hasta')
+const err_lecturas = document.getElementById('err-lecturas')
 
 const caseríos_datalist = document.getElementById('suggested-caseríos')
 const meters_datalist = document.getElementById('suggested-meters')
@@ -71,18 +80,15 @@ const lecturaInput = document.getElementById('meter-reading')
 // }
 
 // To set today as the default value in all dates {
-const initial_date = document.getElementById('fecha-inicial')
 const measurement_date = document.getElementById('fecha-lectura-actual')
 // }
 
-const fees_table = document.getElementById('fees-table')
 const fees_section_b = document.getElementById('fees-section')
+const fees_table = document.getElementById('fees-table')
 const fees_searchbox = document.getElementById('fees-search')
 
-const iframe = document.getElementById('receipt')
-
-const csv_b = document.getElementById('csv-btn')
 const csv_table = document.getElementById('csv-table')
+const csv_b = document.getElementById('csv-btn')
 const csv_filter = document.getElementById('csv-filter')
 const csv_switchbox = document.getElementById('csv-switches')
 const csv_searchbox = document.getElementById('csv-search')
@@ -91,16 +97,16 @@ const csv = {
    current: { data: null }
 }
 
+const user_guide = document.getElementById('user-guide')
+const help_search = document.getElementById('help-search')
+
 const dl_meters_csv_b = document.getElementById('export-meters-csv')
 const dl_meters_json_b = document.getElementById('export-meters-json')
-
-const print_b = document.getElementById('print-btn')
 
 
 const open_req = indexedDB.open('meters', 1)
 let db = null
 let fees = null
-
 
 open_req.onerror = handle_db_err
 
@@ -145,30 +151,25 @@ open_req.onsuccess = success_ev => {
    fill_table(fees_table, fees, ['mínimo', 'máximo', 'fórmula'])
 }
 
-print_b.addEventListener('click', () => {
+let receipt = JSON.parse(localStorage.getItem('receipt')) ?? {}
+num_first_receipt.textContent = receipt.first ?? 'indefinido'
+num_next_receipt.textContent = receipt.next ?? 'indefinido'
 
-   iframe.contentWindow.focus()
-   iframe.contentWindow.print();
-}, { passive: true })
+set_receipt_b.addEventListener('click', () => {
 
-meters_table.addEventListener('click', click_ev => {
+   const receipt_num_given = meters.last.data.some(row => typeof row.recibo === 'number')
+      || meters.current.data.some(row => typeof row.recibo === 'number')
 
-   const clicked_row = click_ev.target.closest('tr')
+   if (receipt_num_given)
+   {
+      err_receipt_f.parentElement.showModal()
+      return
+   }
 
-   if (!clicked_row) return
-
-   const meter = clicked_row.querySelector('.medidor').textContent
-   const data_row = meters.current.data.find(row => row.medidor === meter)
-
-   const span = document.createElement('span')
-   span.textContent = JSON.stringify(data_row)
-
-   iframe.contentDocument.body.append(span)
-
-
-   iframe.parentElement.parentElement.showModal()
-
+   num_recibo_f.parentElement.showModal()
 })
+
+// TODO: PRINTING LISTENER.
 
 table_select.addEventListener('change', changeEv => {
 
@@ -187,10 +188,11 @@ table_select.addEventListener('change', changeEv => {
 
       // This array could be global with no issues:
 
-      const def_col_order = ['medidor', 'zona', 'titular', 'caserío', 'lectura_anterior', 'desde', 'lectura_actual', 'hasta']
+      const def_col_order = ['medidor', 'zona', 'titular', 'caserío', 'lectura_anterior', 'desde', 'lectura_actual', 'hasta', 'recibo']
 
       fill_table(meters_table, meters.current.data, def_col_order)
       insert_switches(meters_switchbox, meters_table, def_col_order)
+      th_sort_meters(meters_table)
 
       if (meters.current.key !== meters.last.key)
       {
@@ -210,11 +212,31 @@ table_select.addEventListener('change', changeEv => {
 
 add_meter_b.addEventListener('click', () => {
 
-   initial_date.value = new Date().toLocaleDateString('en-ca')
-   fill_datalist(caseríos_datalist, 'caserío')
-   new_meter_f.parentElement.showModal()
+   if (typeof receipt.next === 'number')
+   {
+      fill_datalist(caseríos_datalist, 'caserío')
+      new_meter_f.parentElement.showModal()
+      return
+   }
+
+   // initial_date.value = new Date().toLocaleDateString('en-ca')
+   num_recibo_f.parentElement.showModal()
 
 }, { passive: true })
+
+num_recibo_f.addEventListener('submit', submit_ev => {
+
+   const first = getFormData(submit_ev.target).first_receipt
+   receipt = { first, next: first }
+
+   localStorage.setItem('receipt', JSON.stringify(receipt))
+
+   num_first_receipt.textContent = receipt.first
+   num_next_receipt.textContent = receipt.next
+
+}, { passive: true })
+
+new Show_Btn(help_section_b, user_guide, help_search)
 
 new_meter_f.addEventListener('submit', submit_ev => {
 
@@ -273,12 +295,26 @@ new_reading_f.addEventListener('submit', submit_ev => {
       return
    }
 
-   const no_measurement = typeof matching_meter.lectura_actual !== 'number'
+   const sin_lectura_actual = typeof matching_meter.lectura_actual !== 'number'
 
-   if (no_measurement)
+   if (sin_lectura_actual)
    {
+      if (matching_meter.desde >= form_data.hasta)
+      {
+         err_desde_hasta_f.parentElement.showModal()
+         return
+      }
+
+      if (matching_meter.lectura_anterior > form_data.lectura_actual)
+      {
+         err_lecturas.parentElement.showModal()
+         return
+      }
+
       matching_meter.lectura_actual = form_data.lectura_actual
       matching_meter.hasta = form_data.hasta
+      matching_meter.recibo = new_receipt()
+
 
       const put_req = db
          .transaction('meters', 'readwrite')
@@ -302,6 +338,18 @@ new_reading_f.addEventListener('submit', submit_ev => {
 
    if (all_meters_read)
    {
+      if (matching_meter.hasta >= form_data.hasta)
+      {
+         err_desde_hasta_f.parentElement.showModal()
+         return
+      }
+
+      if (matching_meter.lectura_actual > form_data.lectura_actual)
+      {
+         err_lecturas.parentElement.showModal()
+         return
+      }
+
       const new_table_data = []
 
       for (const row_old_version of meters.last.data)
@@ -316,7 +364,8 @@ new_reading_f.addEventListener('submit', submit_ev => {
             lectura_anterior: lectura_actual,
             desde: hasta,
             lectura_actual: form_data.medidor === medidor ? form_data.lectura_actual : undefined,
-            hasta: form_data.medidor === medidor ? form_data.hasta : undefined
+            hasta: form_data.medidor === medidor ? form_data.hasta : undefined,
+            recibo: form_data.medidor === medidor ? new_receipt() : undefined
          }
 
          new_table_data.push(row_new_version)
@@ -424,6 +473,103 @@ new Show_Btn(fees_section_b, fees_table, fees_searchbox)
 // console.log(eval(formula))
 
 //* FUNCTIONS:
+
+function th_sort_meters() {
+
+   const THs = meters_table.tHead.rows[0]?.children
+   const tbody = meters_table.tBodies[0]
+   const rows = Array.from(tbody.rows)
+
+   const data_types = { medidor: 'string', zona: 'number', titular: 'string', caserio: 'string', lectura_anterior: 'number', desde: 'number', lectura_actual: 'number', hasta: 'number', recibo: 'number' }
+
+   for (const th of THs)
+   {
+      th.setAttribute('data-row-order', 'default')
+
+      const col = th.getAttribute('data-class')
+      const col_data_type = data_types[col]
+
+      if (col_data_type === 'number')
+      {
+         th.addEventListener('click', () => {
+
+            if (th.getAttribute('data-row-order') === 'ascending')
+            {
+               th.setAttribute('data-row-order', 'descending')
+            } else
+            {
+               th.setAttribute('data-row-order', 'ascending')
+            }
+
+            rows.sort((row_a, row_b) => {
+
+               let num_a = Number(Array
+                  .from(row_a.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .getAttribute('data-value'))
+
+
+               let num_b = Number(Array
+                  .from(row_b.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .getAttribute('data-value'))
+
+               if (isNaN(num_a)) num_a = 0
+               if (isNaN(num_b)) num_b = 0
+
+               return th.getAttribute('data-row-order') === 'ascending' ? num_a - num_b : num_b - num_a
+            })
+
+            tbody.textContent = ''
+            tbody.append(...rows)
+         })
+      } else if (col_data_type === 'string')
+      {
+         th.addEventListener('click', () => {
+
+            if (th.getAttribute('data-row-order') === 'ascending')
+            {
+               th.setAttribute('data-row-order', 'descending')
+            } else
+            {
+               th.setAttribute('data-row-order', 'ascending')
+            }
+
+            rows.sort((row_a, row_b) => {
+
+               let str_a = Array
+                  .from(row_a.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .getAttribute('data-value')
+
+               let str_b = Array
+                  .from(row_b.cells)
+                  .find(cell => cell.getAttribute('data-class') === col)
+                  .getAttribute('data-value')
+
+               str_a = str_a ? str_a.toLowerCase() : ''
+               str_b = str_b ? str_b.toLowerCase() : ''
+
+               if (str_a < str_b) return th.getAttribute('data-row-order') === 'ascending' ? -1 : 1
+               if (str_a > str_b) return th.getAttribute('data-row-order') === 'ascending' ? 1 : -1
+
+               return 0
+            })
+
+            tbody.textContent = ''
+            tbody.append(...rows)
+         })
+      }
+   }
+}
+
+function new_receipt() {
+
+   const current_receipt = receipt.next
+   num_next_receipt.textContent = ++receipt.next
+   localStorage.setItem('receipt', JSON.stringify(receipt))
+   return current_receipt
+}
 
 function name_dl_file() {
 
