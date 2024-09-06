@@ -267,3 +267,192 @@ select {
    align-self: stretch;
    border-bottom: 1px solid black;
 }
+
+/* Style for the receipts: */
+
+@media print {
+
+   body * {
+      /* box-sizing: border-box; */
+      display: none;
+      align-items: stretch;
+      /* color: transparent; */
+   }
+
+   body {
+      /* font-family: system-ui, Arial, Helvetica, sans-serif; */
+      font-size: medium;
+      margin: 0;
+      text-align: center;
+      background-color: transparent;
+   }
+
+   aside,
+   aside * {
+      display: block;
+   }
+
+
+   aside>article {
+      page-break-after: always;
+   }
+
+
+   .border {
+      border: 3px solid #34869c;
+      border-radius: 11px;
+   }
+
+   .border-radius-up {
+      border: 3px solid #34869c;
+      border-top-left-radius: 11px;
+      border-top-right-radius: 11px;
+      border-bottom: 0px;
+   }
+
+   .border-radius-down {
+      border: 3px solid #34869c;
+      border-bottom-left-radius: 11px;
+      border-bottom-right-radius: 11px;
+      border-top: 0px;
+   }
+
+   .simple-border-up {
+      border: 3px solid #34869c;
+      border-bottom: 0px;
+
+   }
+
+   .simple-border {
+      border: 3px solid #34869c;
+   }
+
+   .underline {
+      border-bottom: 2px solid #34869c;
+      width: 80%;
+   }
+
+   .template-text {
+      color: #34869c;
+      text-transform: uppercase;
+      font-size: 15px;
+   }
+
+   .bold {
+      font-weight: bold;
+   }
+
+   /*.datos-de-usuario {*/
+   /*  display:grid;*/
+   /*  grid-template-columns: 20% 55% auto;*/
+   /*  grid-gap: 10px;*/
+   /**/
+   /*  align-items: stretch;*/
+   /*}*/
+
+   .flex-container {
+      display: flex;
+      justify-content: center;
+      /*align-items: center;*/
+   }
+
+   .flex-container div {
+      padding: 2px;
+      /*border-radius: 11px;*/
+   }
+
+   .user-caserio {
+      display: flex;
+      /*background-color: DodgerBlue;*/
+      /*justify-content: flex-start;*/
+      /*align-items: start;*/
+      align-items: center;
+      font-size: 19px;
+      justify-content: center;
+   }
+
+
+   .user-name {
+      display: flex;
+      /*background-color: DodgerBlue;*/
+      /*justify-content: flex-start;*/
+      align-items: center;
+      font-size: 19px;
+      justify-content: center;
+   }
+
+   .jaap-header-and-legend {
+      display: flex;
+      justify-content: center;
+      /*align-items: center;*/
+      flex-direction: column;
+      text-align: center;
+      text-transform: uppercase;
+      /*font-size: 15px;*/
+   }
+
+
+   .flex-container.border {
+      padding: 10px;
+      align-items: center;
+   }
+
+   section {
+      padding: 1.0rem;
+      height: 49vh;
+   }
+
+   .bigger {
+      font-size: 20px;
+   }
+
+   .grid-container {
+      display: grid;
+
+   }
+
+   .bl {
+      /*border: 3px solid #34869c;*/
+      border-left: 3px solid #34869c;
+   }
+
+   .br {
+      /*border: 3px solid #34869c;*/
+      border-right: 3px solid #34869c;
+   }
+
+   .bb {
+      /*border: 3px solid #34869c;*/
+      border-bottom: 3px solid #34869c;
+   }
+
+   .bt {
+      /*border: 3px solid #34869c;*/
+      border-top: 3px solid #34869c;
+   }
+
+   .btrr {
+      /*border: 3px solid #34869c;*/
+      border-top-right-radius: 11px;
+   }
+
+   .bbrr {
+      /*border: 3px solid #34869c;*/
+      border-bottom-right-radius: 11px;
+   }
+
+   .btlr {
+      /*border: 3px solid #34869c;*/
+      border-top-left-radius: 11px;
+   }
+
+   .bblr {
+      /*border: 3px solid #34869c;*/
+      border-bottom-left-radius: 11px;
+   }
+}
+
+@page {
+   size: letter portrait;
+   margin: 0;
+}

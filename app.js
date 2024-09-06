@@ -43,11 +43,16 @@ const set_receipt_b = document.getElementById('set-receipt-btn')
 const err_receipt_f = document.getElementById('err-num-recibo')
 const num_first_receipt = document.getElementById('num-first-receipt')
 const num_next_receipt = document.getElementById('num-next-receipt')
+const total_meters = document.getElementById('total-medidores')
+const receipts_container = document.getElementById('receipts')
+const print_all_b = document.getElementById('print-all-btn')
 
 const table_select = document.getElementById('history')
 const meters_table = document.getElementById('meters-table')
 const meters_switchbox = document.getElementById('meters-switches')
 const meters_searchbox = document.getElementById('meter-search')
+const cell_row_options_f = document.getElementById('cell-row-options')
+const no_print_f = document.getElementById('no-print-f')
 
 const add_meter_b = document.getElementById('meter-add-btn')
 const new_meter_f = document.getElementById('meter-form')
@@ -103,6 +108,11 @@ const help_search = document.getElementById('help-search')
 const dl_meters_csv_b = document.getElementById('export-meters-csv')
 const dl_meters_json_b = document.getElementById('export-meters-json')
 
+const ms_in_a_day = 24 * 60 * 60 * 1000
+
+const receipt_template = document.getElementById('remove-this-id')
+// The id below must be removed in order to avoid several elements with the same id:
+receipt_template.removeAttribute('id')
 
 const open_req = indexedDB.open('meters', 1)
 let db = null
@@ -148,7 +158,9 @@ open_req.onsuccess = success_ev => {
 
    update_select()
    fees = JSON.parse(localStorage.getItem('fees'))
-   fill_table(fees_table, fees, ['mínimo', 'máximo', 'fórmula'])
+   fill_fees_table(['mínimo', 'máximo', 'fórmula'])
+
+
 }
 
 let receipt = JSON.parse(localStorage.getItem('receipt')) ?? {}
@@ -168,8 +180,6 @@ set_receipt_b.addEventListener('click', () => {
 
    num_recibo_f.parentElement.showModal()
 })
-
-// TODO: PRINTING LISTENER.
 
 table_select.addEventListener('change', changeEv => {
 
@@ -192,7 +202,9 @@ table_select.addEventListener('change', changeEv => {
 
       fill_table(meters_table, meters.current.data, def_col_order)
       insert_switches(meters_switchbox, meters_table, def_col_order)
-      th_sort_meters(meters_table)
+      th_sort_meters()
+      cell_options()
+      total_meters.textContent = meters_table.tBodies[0].rows.length
 
       if (meters.current.key !== meters.last.key)
       {
@@ -205,6 +217,77 @@ table_select.addEventListener('change', changeEv => {
          add_meter_b.removeAttribute('disabled')
          add_reading_b.removeAttribute('disabled')
          meters_table.tBodies[0].classList.remove('non-first')
+      }
+
+      receipts_container.textContent = ''
+
+      for (const receipt_data of meters.current.data)
+      {
+         if (receipt_data.recibo === undefined) continue
+
+         const new_receipt = receipt_template.cloneNode(true)
+         const fields = new_receipt.querySelectorAll('[data-field]')
+
+         for (const field of fields)
+         {
+            switch (field.getAttribute('data-field'))
+            {
+               case 'nombre': field.textContent = receipt_data.titular; break
+               case 'caserio': field.textContent = receipt_data['caserío']; break
+               case 'recibo': field.textContent = receipt_data.recibo; break
+               case 'medidor': field.textContent = receipt_data.medidor; break
+               case 'zona': field.textContent = receipt_data.zona; break
+               case 'desde':
+                  field.textContent = new Date(receipt_data.desde).toLocaleDateString('es', {
+                     day: 'numeric',
+                     year: 'numeric',
+                     month: 'short',
+                     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                  })
+                  break
+
+               case 'hasta':
+                  field.textContent = new Date(receipt_data.hasta).toLocaleDateString('es', {
+                     day: 'numeric',
+                     year: 'numeric',
+                     month: 'short',
+                     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                  })
+                  break
+               case 'lectura_anterior': field.textContent = receipt_data.lectura_anterior; break
+               case 'lectura_actual': field.textContent = receipt_data.lectura_actual; break
+               case 'cubre':
+                  field.textContent = (receipt_data.hasta - receipt_data.desde) / ms_in_a_day
+                  break
+
+               case 'consumo':
+                  field.textContent = receipt_data.lectura_actual - receipt_data.lectura_anterior
+                  break
+
+               case 'cargo':
+                  const consumo = receipt_data.lectura_actual - receipt_data.lectura_anterior
+
+                  const formula = fees.find(range =>
+                     range['mínimo'] <= consumo && consumo <= (range['máximo'] ?? 1000000)
+                  )
+                  ['fórmula']
+
+                  const cargo = new Function('consumo', `return ${formula}`)
+
+                  field.textContent = cargo(consumo).toFixed(2)
+                  break
+
+               case 'multa':
+                  field.textContent = 1.15
+                  break
+
+            }
+         }
+
+         const article = document.createElement('article')
+         const hr = document.createElement('hr')
+         article.append(new_receipt, hr, new_receipt.cloneNode(true))
+         receipts_container.append(article)
       }
    }
 
@@ -468,11 +551,71 @@ dl_meters_json_b.addEventListener('click', () => {
 
 new Show_Btn(fees_section_b, fees_table, fees_searchbox)
 
+print_all_b.addEventListener('click', () => {
+
+   if (meters.current.data.some(row => row.recibo === undefined))
+   {
+      no_print_f.parentElement.showModal()
+   }
+   else
+   {
+      print()
+   }
+})
+
 // const consumo = 20
 // const formula = fees.find(row => row.mínimo >= consumo && (row.máximo ?? Number.MAX_SAFE_INTEGER) <= consumo)
 // console.log(eval(formula))
 
 //* FUNCTIONS:
+
+function cell_options() {
+
+   const tbody = meters_table.tBodies[0]
+
+   tbody.addEventListener('click', () => {
+
+      cell_row_options_f.parentElement.showModal()
+   }, { passive: true })
+}
+
+function fill_fees_table(col_order) {
+
+   fees_table.textContent = ''
+
+   const caption = fees_table.createCaption()
+   const sup = document.createElement('sup')
+   sup.textContent = 3
+   caption.append(document.createTextNode('Fórmulas según el consumo en m'), sup)
+
+   const thead_row = fees_table.createTHead().insertRow()
+
+   for (const col of col_order)
+   {
+      const th = document.createElement('th')
+      th.setAttribute('data-class', remove_diacritics(col).replaceAll(' ', '-'))
+      th.setAttribute('data-row-order', 'default')
+      th.textContent = col.replaceAll('_', ' ')
+      thead_row.appendChild(th)
+   }
+
+   const tbody = fees_table.createTBody()
+
+   for (const row_data of fees)
+   {
+      const tr = tbody.insertRow()
+
+      for (const col of col_order)
+      {
+         const td = tr.insertCell()
+         td.setAttribute('data-class', remove_diacritics(col).replaceAll(' ', '-'))
+
+         const datum = row_data[col]
+         td.setAttribute('data-value', datum)
+         td.textContent = datum
+      }
+   }
+}
 
 function th_sort_meters() {
 
