@@ -51,7 +51,7 @@ const table_select = document.getElementById('history')
 const meters_table = document.getElementById('meters-table')
 const meters_switchbox = document.getElementById('meters-switches')
 const meters_searchbox = document.getElementById('meter-search')
-const cell_row_options_f = document.getElementById('cell-row-options')
+const cell_options_f = document.getElementById('cell-options')
 const no_print_f = document.getElementById('no-print-f')
 
 const add_meter_b = document.getElementById('meter-add-btn')
@@ -110,9 +110,10 @@ const dl_meters_json_b = document.getElementById('export-meters-json')
 
 const ms_in_a_day = 24 * 60 * 60 * 1000
 
-const receipt_template = document.getElementById('remove-this-id')
+const receipt_template = document.getElementById('receipt-template')
+// const receipt_template = document.getElementById('remove-this-id')
 // The id below must be removed in order to avoid several elements with the same id:
-receipt_template.removeAttribute('id')
+// receipt_template.removeAttribute('id')
 
 const open_req = indexedDB.open('meters', 1)
 let db = null
@@ -225,7 +226,7 @@ table_select.addEventListener('change', changeEv => {
       {
          if (receipt_data.recibo === undefined) continue
 
-         const new_receipt = receipt_template.cloneNode(true)
+         const new_receipt = receipt_template.content.cloneNode(true)
          const fields = new_receipt.querySelectorAll('[data-field]')
 
          for (const field of fields)
@@ -573,9 +574,56 @@ function cell_options() {
 
    const tbody = meters_table.tBodies[0]
 
-   tbody.addEventListener('click', () => {
+   tbody.addEventListener('click', click_ev => {
 
-      cell_row_options_f.parentElement.showModal()
+      const cell_text = click_ev.target.textContent
+      const row_cells = Array.from(click_ev.target.parentElement.cells)
+
+      const row_text = row_cells
+         .map(cell => cell.textContent)
+         .join(' ')
+
+      const data_class = click_ev.target.getAttribute('data-class')
+
+      const medidor = row_cells
+         .find(cell => cell.getAttribute('data-class') === 'medidor')
+         .getAttribute('data-value')
+
+      const data_row = meters.current.data.find(row => row.medidor === medidor)
+
+      cell_options_f.addEventListener('submit', submit_ev => {
+
+         switch (submit_ev.submitter.name)
+         {
+            case 'copy-cell':
+               navigator.clipboard.writeText(cell_text)
+               break
+            case 'copy-row':
+               navigator.clipboard.writeText(row_text)
+               break
+            case 'edit-cell':
+               switch (data_class)
+               {
+                  case 'medidor':
+
+                  case 'zona':
+                  case 'titular':
+                  case 'caserio':
+                  case 'lectura_anterior':
+                  case 'desde':
+                  case 'lectura_actual':
+                  case 'hasta':
+                  case 'recibo':
+               }
+               break
+            case 'print-cell':
+               break
+         }
+
+      }, { passive: true })
+
+      cell_options_f.parentElement.showModal()
+
    }, { passive: true })
 }
 

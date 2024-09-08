@@ -17,7 +17,8 @@
 </head>
 
 <body>
-   <header style="display:flex; align-items: center; justify-content: space-evenly;">
+
+   <header>
       <h1>Registro de la Junta Administradora de Agua Potable</h1>
       <img src="favicon.png" alt="JAAP logo" style="max-width:8vw; padding-top: 1%;">
    </header>
@@ -262,18 +263,18 @@
    </dialog>
 
    <dialog>
-      <form method='dialog' id='cell-row-options'>
-         <p>Elija una opción:</p>
-         <input id='edit-cell' type='radio' name='cell-row-option' value='edit-cell'>
-         <label for='edit-cell'>Editar celda</label>
-         <input id='print-all' type='radio' name='cell-row-option' value='print-all'>
-         <label for='print-all'>Imprimir recibos</label>
-         <small>Nota 1: En la vista previa para imprimir, también hay una opción para guardar los recibos en formato
-            PDF.</small>
-         <small>Nota 2: No se generarán recibos para los medidores que no tengan número de recibo en la tabla más
-            reciente. El número de recibo se genera al tomar la lectura. Es decir: No se generarán recibos de los
-            medidores que aún no hayan sido leídos en este periodo.</small>
-         <input type='submit'>
+      <form method='dialog' id='cell-options'>
+         <p>celda: <span></span></p>
+         <p></p>
+         <!-- <button id='test'><img id='testimg' src='./icons/content_copy_24dp.png'><span>copiar celda</span></button> -->
+         <button id='test2'>copiar celda</button>
+         <input type='submit' name='copy-cell' value='copiar celda'>
+         <input type='submit' name='edit-cell' value='editar celda'>
+         <input type='submit' name='copy-row' value='copiar fila'>
+         <input type='submit' name='delete-cell' value='borrar fila'>
+         <input type='submit' name='print-cell' value='imprimir recibo'>
+         <input type='button' value='Cancelar' onclick='this.closest("dialog").close()'>
+
       </form>
    </dialog>
 
@@ -297,163 +298,104 @@
       <article id='user-guide' hidden></article>
    </main>
 
-   <aside id='receipts' hidden></aside>
+   <aside id='receipts'></aside>
 
-   <!-- The id below must be removed in order to avoid several elements with the same id: -->
-   <section id='remove-this-id' hidden>
-      <div class="grid-container " style="row-gap: 10px;">
+   <template id='receipt-template'>
 
-         <div class="flex-container border" style='justify-content: space-between;'>
-            <div><img src="favicon.png" style="height: 133px; width: 133px;"></div>
-
+      <section class='receipt-template'>
+         <div class='sec-A'>
             <div>
-               <div style='white-space: nowrap;' class="jaap-header-and-legend template-text">
-                  <div class="bigger bold" style='color: inherit;'>Junta Administradora de Agua Potable</div>
-                  <div style='color: inherit;'>Asociación de Desarrollo Comunal "El Buen Progreso"<br>del
-                     Cantón
-                     Corral Viejo, Tenancingo,<br>
-                     Cuscatlán, El Salvador, C.A.</div>
-               </div>
+               <img src='favicon.png' height='133' width='133'>
+            </div>
 
-               <div class="user-name">
-                  <div class="template-text bold">Nombre:</div>
-                  <div class="underline" data-field='nombre'>José Ricardo Pichinte</div>
+            <div class='sec-header'>
+               <div class='receipt-title'>Junta Administradora de Agua Potable</div>
+               <div class='nowrap-whitespace'>Asociación de Desarrollo Comunal "El Buen Progreso"<br>del
+                  Cantón
+                  Corral Viejo, Tenancingo,<br>
+                  Cuscatlán, El Salvador, C.A.
                </div>
-
-               <div class="user-caserio">
-                  <div class="template-text bold">Caserio:</div>
+               <div class='underline-field'>
+                  <div>Nombre:&nbsp;</div>
+                  <div class='underline' data-field='nombre'>José Ricardo Pichinte</div>
+               </div>
+               <div class='underline-field'>
+                  <div>Caserio:&nbsp;</div>
                   <div class="underline" data-field='caserio'>La Profética</div>
                </div>
-
             </div>
 
-            <div style="display: flex;row-gap: 8px;flex-direction: column;">
-
-               <div class="border">
-                  <div class="template-text bold">RECIBO</div>
-                  <div style="color:red;display: flex; justify-content: space-around;">
-                     <span>N°</span>&nbsp;<span data-field='recibo'>915987915987</span>
-                  </div>
+            <div class='sec-medidor-recibo'>
+               <div class='sec-recibo'>
+                  <div>RECIBO</div>
+                  <div>N°&nbsp;<span data-field='recibo'>1987915987</span></div>
                </div>
-
-               <div>
-                  <div class="border-radius-up template-text">MEDIDOR</div>
-                  <div class="simple-border-up" data-field='medidor'>020318</div>
-                  <div class="simple-border template-text">ZONA</div>
-                  <div class="border-radius-down" data-field='zona'>9</div>
+               <div class='sec-medidor'>
+                  <div>MEDIDOR</div>
+                  <div data-field='medidor'>020318</div>
+                  <div>ZONA</div>
+                  <div data-field='zona'>9</div>
                </div>
-
             </div>
          </div>
 
-         <div class="grid-container border" style="grid-template-columns: auto auto auto 50%;">
-
-            <div>
-               <div class="br bb template-text"
-                  style="height: 50%; display: flex; align-items: center; justify-content: center;">lectura actual
-               </div>
-               <div class="br" style="height: 50%; display: flex; align-items: center; justify-content: center;"
-                  data-field='lectura_actual'>
-                  266</div>
+         <div class='sec-B'>
+            <div class='sec-consumo'>
+               <div>lectura actual</div>
+               <div>lectura anterior</div>
+               <div>consumo m<sup>3</sup></div>
+               <div data-field='lectura_actual'>266</div>
+               <div data-field='lectura_anterior'>262</div>
+               <div data-field='consumo'>4</div>
             </div>
-
-            <div>
-               <div class="br bb template-text"
-                  style="height: 50%; display: flex; align-items: center; justify-content: center;">lectura
-                  anterior</div>
-               <div class="br" style="height: 50%; display: flex; align-items: center; justify-content: center;"
-                  data-field='lectura_anterior'>
-                  262</div>
+            <div class='sec-servicio'>
+               <div>servicio</div>
+               <div>desde</div>
+               <div>hasta</div>
+               <div>cubre</div>
+               <div data-field='desde'>22-10-23</div>
+               <div data-field='hasta'>22-11-23</div>
+               <div data-field='cubre'>30</div>
             </div>
-
-            <div>
-               <div class="bb template-text"
-                  style="height: 50%; display: flex; align-items: center; justify-content: center;">consumo M
-                  <sup>3</sup>
-               </div>
-               <div style="height: 50%; display: flex; align-items: center; justify-content: center;"
-                  data-field='consumo'>4</div>
-            </div>
-
-            <div class="grid-container" style="grid-template-columns: auto;">
-
-               <div class="bl bb template-text">Servicio</div>
-               <div class="grid-container" style="grid-template-columns: auto auto auto;">
-                  <div class="bl bb br template-text"> desde </div>
-                  <div class="bb br template-text"> hasta </div>
-                  <div class="bb template-text"> cubre </div>
-                  <div class="bl br" data-field='desde'> 22-10-23 </div>
-                  <div class="br" data-field='hasta'> 22-11-23 </div>
-                  <div data-field='cubre'> 30 </div>
-               </div>
-
-            </div>
-
          </div>
 
-         <div class="grid-container " style="grid-template-columns: 1;">
-            <div class="grid-container bl br bt btlr btrr" style="grid-template-columns: 10% 65% auto;">
+         <div class='sec-C'>
+            <div>código</div>
+            <div>concepto facturado</div>
+            <div>importe en dólares</div>
 
-               <div>
-                  <div class="template-text br bb" style="padding:2px 0px 2px 0px;"> código </div>
-                  <div class="template-text br" style="padding:2px 0px 2px 0px;"> 01 </div>
-                  <div class="template-text br" style="padding:2px 0px 2px 0px;"> 02 </div>
-                  <div class="template-text br" style="padding:2px 0px 2px 0px;"> 03 </div>
-                  <div class="template-text br" style="padding:2px 0px 2px 0px;"> 04 </div>
-                  <div class="template-text br" style="padding:2px 0px 2px 0px;"> 05 </div>
-               </div>
+            <div>01</div>
+            <div>cargo por consumo de agua</div>
+            <div>$ <span data-field='cargo'>2.61</span></div>
 
-               <div>
-                  <div class="template-text br bb" style="padding:2px 0px 2px 0px;"> concepto facturado </div>
-                  <div class="template-text br" style="text-align: justify; padding:2px 0px 2px 20px;"> cargo por
-                     consumo de agua </div>
-                  <div class="template-text br" style="text-align: justify; padding:2px 0px 2px 20px;"> deuda
-                     pendiente </div>
-                  <div class="template-text br" style="text-align: justify; padding:2px 0px 2px 20px;"> multa
-                  </div>
-                  <div class="template-text br" style="text-align: justify; padding:2px 0px 2px 20px;"> otros
-                  </div>
-                  <div class="template-text br" style="text-align: justify; padding:2px 0px 2px 20px;"> subsidios
-                     o compensaciones </div>
-               </div>
+            <div>02</div>
+            <div>deuda pendiente</div>
+            <div>$</div>
 
-               <div>
-                  <div class="template-text bb" style="padding:2px 0px 2px 0px;"> importe en dólares </div>
+            <div>03</div>
+            <div>multa</div>
+            <div>$</div>
 
-                  <div class="template-text" style="display: flex; padding:2px 10px 2px 10px; font-size: 15px;">
-                     $ <span style='margin: auto; color: initial; font-size: 16px;' data-field='cargo'>
-                        2.61
-                     </span>
-                  </div>
-                  <div class="template-text" style="text-align: justify; padding:2px 0px 2px 10px;"> $ </div>
-                  <div class="template-text" style="text-align: justify; padding:2px 0px 2px 10px;"> $ </div>
-                  <div class="template-text" style="text-align: justify; padding:2px 0px 2px 10px;"> $ </div>
-                  <div class="template-text" style="text-align: justify; padding:2px 0px 2px 10px;"> $ </div>
-               </div>
+            <div>04</div>
+            <div>otros</div>
+            <div>$</div>
 
+            <div>05</div>
+            <div><span>subsidios o compensaciones</span><span>menos</span></div>
+            <div>$</div>
+
+            <div>fecha de pago</div>
+            <div data-field='fechas-de-pago'></div>
+            <div>total a pagar</div>
+            <div>$</div>
+            <div>
+               <div>* Recuerde, después de vencido pagará $ <span data-field='multa'>1.15</span>&nbsp;de multa.</div>
+               <div>* Horario de pago:&nbsp;<span data-field='horario-de-pago'>8:00 A.M. a 4:00 P.M.</span></div>
             </div>
-
-            <div class="grid-container br bt bl " style="grid-template-columns: auto 43% auto 25%;">
-               <div class="template-text br" style="padding:2px 0px 2px 0px;">fecha de pago</div>
-               <div style="padding:2px 0px 2px 0px;">01, 02 - Diciembre - 2023</div>
-               <div class="template-text br bl" style="padding:2px 0px 2px 0px;">total a pagar</div>
-               <div class="template-text" style="padding:2px 0px 2px 10px;text-align: justify;">$</div>
-            </div>
-
-            <div class="bl bt br bb bbrr bblr" style="display: flex; padding: 2px; justify-content: space-between;">
-               <div
-                  style="display: flex; color:#34869c;font-size: 15px; padding:2px 0px 2px 0px; min-width: max-content; flex-grow: 1;">
-                  *
-                  Recuerde, después de vencido pagará $ <span data-field='multa'>1.15</span>&nbsp;de multa.
-               </div>
-               <div class="template-text" style="padding:2px 0px 2px 0px;">* Horario de pago: 8:00 A.M. a 4:00
-                  P.M.
-               </div>
-            </div>
-
          </div>
-      </div>
-   </section>
+      </section>
+
+   </template>
 
 </body>
 
