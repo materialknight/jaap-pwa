@@ -5,10 +5,11 @@
    "theme_color": "#e5fafd",
    "background_color": "#e5fafd",
    "display": "standalone",
+   "orientation": "landscape",
    "start_url": "/jaap-pwa/",
    "icons": [
       {
-         "src": "./favicon.png",
+         "src": "./icons/favicon.png",
          "sizes": "512x512"
       }
    ]

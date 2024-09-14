@@ -1,8 +1,8 @@
 'use strict'
 
-import { csvParse, csvFormat } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
+// import { csvParse, csvFormat } from 'https://cdn.jsdelivr.net/npm/d3-dsv@3/+esm'
 import { getFormData } from './form-data.js'
-import { Show_Btn, insert_switches, fill_table, filter_input, handle_db_err, remove_diacritics } from './core-funcs.js'
+import { Show_Btn, sticky_THs, insert_switches, fill_table, filter_input, handle_db_err, remove_diacritics } from './core-funcs.js'
 
 // Migration {
 
@@ -37,6 +37,10 @@ if ("serviceWorker" in navigator)
 const meters_section_b = document.getElementById('meters-section')
 const csv_section_b = document.getElementById('csv-section')
 const help_section_b = document.getElementById('help-section')
+
+const nav = document.querySelector('nav')
+const cell_content = document.getElementById('cell-content')
+const row_content = document.getElementById('row-content')
 
 const num_recibo_f = document.getElementById('num-recibo')
 const set_receipt_b = document.getElementById('set-receipt-btn')
@@ -204,6 +208,7 @@ table_select.addEventListener('change', changeEv => {
       fill_table(meters_table, meters.current.data, def_col_order)
       insert_switches(meters_switchbox, meters_table, def_col_order)
       th_sort_meters()
+      sticky_THs(meters_table, nav)
       cell_options()
       total_meters.textContent = meters_table.tBodies[0].rows.length
 
@@ -221,6 +226,19 @@ table_select.addEventListener('change', changeEv => {
       }
 
       receipts_container.textContent = ''
+
+      const article = document.createElement('article')
+      const empty_receipt = receipt_template.content.cloneNode(true)
+
+      empty_receipt.querySelector('section').classList.add('empty-receipt')
+
+      article.append(
+         empty_receipt,
+         document.createElement('hr'),
+         empty_receipt.cloneNode(true)
+      )
+
+      receipts_container.append(article)
 
       for (const receipt_data of meters.current.data)
       {
@@ -293,6 +311,8 @@ table_select.addEventListener('change', changeEv => {
    }
 
 }, { passive: true })
+
+window.addEventListener('resize', () => sticky_THs(meters_table, nav), { passive: true })
 
 add_meter_b.addEventListener('click', () => {
 
@@ -519,7 +539,8 @@ csv_filter.addEventListener(
 
 dl_meters_csv_b.addEventListener('click', () => {
 
-   const csv_doc = csvFormat(meters_table.hidden ? csv.current.data : meters.current.data)
+   // const csv_doc = csvFormat(meters_table.hidden ? csv.current.data : meters.current.data)
+   const csv_doc = csvFormat(meters.current.data)
    const link = document.createElement('a')
 
    link.href = URL.createObjectURL(new Blob(
@@ -527,7 +548,7 @@ dl_meters_csv_b.addEventListener('click', () => {
       { type: 'text/csv', endings: 'native' }
    ))
 
-   link.download = 'tabla.csv'
+   link.download = name_dl_file('csv')
    link.click()
    URL.revokeObjectURL(link.href)
 
@@ -535,7 +556,8 @@ dl_meters_csv_b.addEventListener('click', () => {
 
 dl_meters_json_b.addEventListener('click', () => {
 
-   const json_data = JSON.stringify(meters_table.hidden ? csv.current.data : meters.current.data, null, 3)
+   // const json_data = JSON.stringify(meters_table.hidden ? csv.current.data : meters.current.data, null, 3)
+   const json_data = JSON.stringify(meters.current.data, null, 3)
    const link = document.createElement('a')
 
    link.href = URL.createObjectURL(new Blob(
@@ -543,7 +565,7 @@ dl_meters_json_b.addEventListener('click', () => {
       { type: 'application/json' }
    ))
 
-   link.download = 'tabla.json'
+   link.download = name_dl_file('json')
    link.click()
    URL.revokeObjectURL(link.href)
 
@@ -576,18 +598,26 @@ function cell_options() {
 
    tbody.addEventListener('click', click_ev => {
 
-      const cell_text = click_ev.target.textContent
-      const row_cells = Array.from(click_ev.target.parentElement.cells)
+      const clicked_cell = click_ev.target.closest('td')
+
+      if (!clicked_cell) return
+
+      const cell_text = clicked_cell.textContent
+      const row_cells = Array.from(clicked_cell.parentElement.cells)
 
       const row_text = row_cells
          .map(cell => cell.textContent)
          .join(' ')
+
+      cell_content.textContent = cell_text
+      row_content.textContent = row_text
 
       const data_class = click_ev.target.getAttribute('data-class')
 
       const medidor = row_cells
          .find(cell => cell.getAttribute('data-class') === 'medidor')
          .getAttribute('data-value')
+
 
       const data_row = meters.current.data.find(row => row.medidor === medidor)
 
@@ -620,7 +650,9 @@ function cell_options() {
                break
          }
 
-      }, { passive: true })
+      }, { passive: true, once: true })
+
+
 
       cell_options_f.parentElement.showModal()
 
@@ -672,7 +704,7 @@ function th_sort_meters() {
    const rows = Array.from(tbody.rows)
 
    const data_types = { medidor: 'string', zona: 'number', titular: 'string', caserio: 'string', lectura_anterior: 'number', desde: 'number', lectura_actual: 'number', hasta: 'number', recibo: 'number' }
-
+   console.log(nav.offsetHeight)
    for (const th of THs)
    {
       th.setAttribute('data-row-order', 'default')
@@ -762,10 +794,21 @@ function new_receipt() {
    return current_receipt
 }
 
-function name_dl_file() {
+function name_dl_file(ext) {
 
-   // TODO
-   // meters.last.data[0]?.
+   const options = {
+      year: 'numeric',
+      month: 'short',
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+   }
+
+   let desde = meters.current.data.find(row => row.desde)?.desde
+   let hasta = meters.current.data.find(row => row.hasta)?.hasta
+
+   desde = desde ? new Date(desde).toLocaleDateString('es', options) : ''
+   hasta = hasta ? new Date(hasta).toLocaleDateString('es', options) : ''
+
+   return `lecturas ${desde}-${hasta}.${ext}`
 }
 
 function fill_datalist(datalist, col_key) {

@@ -61,12 +61,14 @@ nav {
 
 th {
    position: sticky;
-   top: auto;
 
    cursor: pointer;
+   background-color: lightskyblue;
 
    &:hover {
-      background-color: aquamarine;
+      /* background-color: aquamarine; */
+      background-color: seashell;
+
    }
 
    &:active {
@@ -80,13 +82,10 @@ table {
    border: 1px solid black;
    border-radius: 3px;
    border-collapse: collapse;
+   /* border-spacing: 1px; */
 
    text-align: center;
    width: 100%;
-
-   thead {
-      background-color: lightskyblue;
-   }
 
    th,
    td {
@@ -274,10 +273,6 @@ select {
    border-bottom: 1px solid black;
 }
 
-#receipts {
-   display: none;
-}
-
 /* Style for the receipts: */
 
 @media print {
@@ -302,35 +297,6 @@ select {
 @page {
    size: letter portrait;
    margin: 0;
-}
-
-/* TODO: DELETE EVERYTHING BELOW */
-
-#test {
-   padding: 0.5rem 0.6rem;
-   font-size: large;
-   display: flex;
-   align-items: center;
-}
-
-#test2 {
-   padding: 0.5rem 0.6rem;
-   font-size: large;
-   padding-left: 3rem;
-   background: url('./icons/content_copy_24dp.png') left / contain content-box no-repeat;
-}
-
-
-#testimg {
-   img {
-      flex-shrink: 1;
-      flex-basis: auto;
-   }
-
-   span {
-      flex-basis: auto;
-      flex-grow: 1;
-   }
 }
 
 .receipt-template {
@@ -454,7 +420,7 @@ select {
    font-weight: bold;
 }
 
-[data-field] {
+[data-field]:not([data-field=recibo]) {
    color: black;
 }
 
@@ -687,3 +653,9 @@ select {
    justify-content: space-between;
    text-transform: none;
 }
+
+.empty-receipt [data-field] {
+   color: transparent;
+}
+
+button[type=submit] {}

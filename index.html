@@ -9,7 +9,7 @@
    <link rel='stylesheet' href='style.css'>
 
    <link rel="manifest" href="manifest.json" />
-   <link rel="icon" href="favicon.png" />
+   <link rel="icon" href="icons/favicon.png" />
 
    <script type='module' src='app.js'></script>
 
@@ -20,7 +20,7 @@
 
    <header>
       <h1>Registro de la Junta Administradora de Agua Potable</h1>
-      <img src="favicon.png" alt="JAAP logo" style="max-width:8vw; padding-top: 1%;">
+      <img src="icons/favicon.png" alt="JAAP logo" style="max-width:8vw; padding-top: 1%;">
    </header>
 
    <nav>
@@ -264,17 +264,29 @@
 
    <dialog>
       <form method='dialog' id='cell-options'>
-         <p>celda: <span></span></p>
-         <p></p>
-         <!-- <button id='test'><img id='testimg' src='./icons/content_copy_24dp.png'><span>copiar celda</span></button> -->
-         <button id='test2'>copiar celda</button>
-         <input type='submit' name='copy-cell' value='copiar celda'>
-         <input type='submit' name='edit-cell' value='editar celda'>
-         <input type='submit' name='copy-row' value='copiar fila'>
-         <input type='submit' name='delete-cell' value='borrar fila'>
-         <input type='submit' name='print-cell' value='imprimir recibo'>
-         <input type='button' value='Cancelar' onclick='this.closest("dialog").close()'>
+         <p>celda: <span id='cell-content'></span></p>
 
+         <button type='submit' name='copy-cell'>
+            <img src='./icons/content_copy.png' height='24' width='24'>
+            copiar celda
+         </button>
+         <button type='submit' name='edit-cell'>
+            <img src='./icons/edit.png' height='24' width='24'>
+            editar celda
+         </button>
+
+         <p>fila: <span id='row-content'></span></p>
+
+         <button type='submit' name='copy-row'>
+            <img src='./icons/copy_all.png' height='24' width='24'>
+            copiar fila
+         </button>
+         <button type='submit' name='delete-row'>
+            <img src='./icons/delete.png'>
+            borrar fila
+         </button>
+         <button type='submit' name='print-receipt'>&#128424; imprimir recibo</button>
+         <button type='submit' name='cancel' onclick='this.closest("dialog").close()'>cancelar</button>
       </form>
    </dialog>
 
@@ -298,14 +310,14 @@
       <article id='user-guide' hidden></article>
    </main>
 
-   <aside id='receipts'></aside>
+   <aside id='receipts' hidden></aside>
 
    <template id='receipt-template'>
 
       <section class='receipt-template'>
          <div class='sec-A'>
             <div>
-               <img src='favicon.png' height='133' width='133'>
+               <img src='icons/favicon.png' height='133' width='133'>
             </div>
 
             <div class='sec-header'>
@@ -317,7 +329,7 @@
                </div>
                <div class='underline-field'>
                   <div>Nombre:&nbsp;</div>
-                  <div class='underline' data-field='nombre'>José Ricardo Pichinte</div>
+                  <div class='underline' data-field='nombre'>José María López Hernández</div>
                </div>
                <div class='underline-field'>
                   <div>Caserio:&nbsp;</div>

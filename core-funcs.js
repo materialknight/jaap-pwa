@@ -1,6 +1,6 @@
 'use strict'
 
-export { Show_Btn, insert_switches, fill_table, filter_input, handle_db_err, remove_diacritics }
+export { Show_Btn, sticky_THs, insert_switches, fill_table, filter_input, handle_db_err, remove_diacritics }
 
 class Show_Btn {
 
@@ -33,6 +33,20 @@ class Show_Btn {
 
       this.constructor.instances.push(this)
    }
+}
+
+function sticky_THs(table, nav) {
+
+   const THs = document.querySelectorAll('th')
+
+   requestAnimationFrame(() => {
+      // const nav_height = nav.getBoundingClientRect().height;
+
+      for (const th of THs)
+      {
+         th.style.top = `${nav.offsetHeight}px`
+      }
+   })
 }
 
 function insert_switches(switchBox, table, def_col_order) {

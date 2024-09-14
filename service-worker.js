@@ -1,7 +1,7 @@
 'use strict'
 
-const CURRENT_CACHE = 'v0.1.13'
-const OLD_CACHE = 'v0.1.12'
+const CURRENT_CACHE = 'v0.1.15'
+const OLD_CACHE = 'v0.1.14'
 
 addEventListener('install', event => {
 
@@ -15,9 +15,14 @@ addEventListener('install', event => {
             './index.html',
             './style.css',
             './app.js',
-            './l-s-tables.js',
+            './core-funcs.js',
             './form-data.js',
-            './manifest.json'
+            './manifest.json',
+            './icons/favicon.png',
+            './icons/content_copy.png',
+            './icons/copy_all.png',
+            './icons/delete.png',
+            './icons/edit.png'
          ]))
    )
 })
